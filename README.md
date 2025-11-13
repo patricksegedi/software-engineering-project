@@ -3,7 +3,7 @@
 
 ---
 
-## 🛠️ Environment Setup
+## Environment Setup
 
 Follow these steps to set up your local development environment.
 
@@ -97,3 +97,9 @@ pip install faster-whisper speechbrain sounddevice wavio webrtcvad pyttsx3 numpy
 ```bash
 python main.py
 ```
+
+
+New stuff
+# pip install TTS
+# brew install espeak
+# pip install transformers==4.37.2

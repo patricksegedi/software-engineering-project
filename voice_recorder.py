@@ -14,6 +14,7 @@ class VoiceRecorder:
         wavio.write(filename, audio, samplerate, sampwidth=2)
         print(f"✅ Saved {filename}")
         return filename
+    
 '''    
 if __name__ == "__main__":
     VoiceRecorder().record()
