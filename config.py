@@ -9,5 +9,7 @@ THRESHOLD = 0.3
 
 # Audio recording
 SAMPLE_RATE = 16000
-RECORD_SECONDS = 5
+RECORD_SECONDS = 3
 VOICE_INPUT = "voice_sample.wav"
+
+#TTS Speakers

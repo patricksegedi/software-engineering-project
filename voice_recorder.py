@@ -1,10 +1,11 @@
 import sounddevice as sd
 import wavio
+from config import SAMPLE_RATE, RECORD_SECONDS, VOICE_INPUT
 
 class VoiceRecorder:
 
-    def record(self, filename="voice_sample.wav", duration=3):
-        samplerate = 16000
+    def record(self, filename=VOICE_INPUT, duration=RECORD_SECONDS):
+        samplerate = SAMPLE_RATE
         print("🎙️ Speak now…")
         audio = sd.rec(int(duration * samplerate),
                        samplerate=samplerate,
@@ -15,7 +16,6 @@ class VoiceRecorder:
         print(f"✅ Saved {filename}")
         return filename
     
-'''    
+    
 if __name__ == "__main__":
     VoiceRecorder().record()
-'''
