@@ -1,9 +1,11 @@
-class UserDbo:
-    def __init__(self, id=None, name=None, role=None, restrictions_link=None):
-        self.id = id
-        self.name = name
-        self.role = role
-        self.restrictions_link = restrictions_link
+# model.py (example)
+from dataclasses import dataclass
 
-    def __repr__(self):
-        return f"UserDbo(id={self.id}, name='{self.name}', role='{self.role}', restrictions_link={self.restrictions_link})"
+@dataclass
+class UserDbo:
+    name: str
+    role: str
+    email: str
+    phone_number: str
+    password: str
+    restriction_list: int | None = None   # 👈 match DB column name & INT type
