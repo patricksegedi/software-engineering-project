@@ -1,21 +1,189 @@
-\documentclass{article}
-\usepackage{amsmath}
+\documentclass[conference]{IEEEtran}
 
-\title{My First LaTeX Document}
-\author{Your Name}
-\date{\today}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{url}
 
 \begin{document}
 
+\title{Speaker-Adaptive Voice Assistant for Multi-User Homes}
+
+\author{
+\IEEEauthorblockN{
+Ken Lee,
+Tae Hee Kim,
+Patrick Segedi,
+Hong Jinseo,
+Nick Ki Gumann}
+\IEEEauthorblockA{Dept. of Information Systems, Hanyang University, Seoul / Paju, Republic of Korea\\
+Dept. of English Language and Literature, Hanyang University, Seoul, Republic of Korea\\
+Dept. of Computer Science, Chalmers University of Technology, Gothenburg, Sweden\\
+Zurich University of Applied Sciences, Zurich, Switzerland\\
+Emails: ceh1502@hanyang.ac.kr, pieceofmind@hanyang.ac.kr, segedi@chalmers.se,\\
+h0dduck@hanyang.ac.kr, gumannic@students.zhaw.ch}
+}
+
 \maketitle
 
-\section{Introduction}
-This is my first LaTeX document.
+\begin{abstract}
+In modern smart homes, voice assistants like Alexa and Google Home serve multiple family members but treat everyone the same way. This application combines speaker recognition with speaker-adaptive processing to create a personalized experience for each household member. The system identifies who is speaking, determines their location within the house, and enforces access rules based on whether the user is a parent or a child. To protect user privacy, all voice data is processed locally on the device rather than being transmitted to external servers. When multiple users issue conflicting commands, the system resolves them according to predefined rules and user priority levels. Our goal is to develop a voice assistant that genuinely understands and adapts to the needs of each family member while ensuring the privacy of their conversations.
+\end{abstract}
 
-\section{Example Equation}
-Here is an example:
-\[
-E = mc^2
-\]
+\begin{IEEEkeywords}
+Voice Assistant, Speaker Recognition, Multi-User Personalization, Smart Home, Privacy
+\end{IEEEkeywords}
+
+\section*{Team Members, Roles, and Tasks}
+
+\textbf{Name, Roles, Task description and etc}
+
+\medskip
+
+\noindent\textbf{Ken Lee}\\
+\textit{Software Developer (AI)}\\
+Responsible for integrating AI features into the voice assistant system. Develops AI models for speaker recognition and intent understanding based on user interaction data, ensuring the system adapts to individual user needs. Focuses on using AI to enhance the product, providing personalized responses and automating voice commands while maintaining a user-friendly experience.
+
+\medskip
+
+\noindent\textbf{Nick Ki Gumann}\\
+\textit{Software Developer (Back-end)}\\
+Manages the server-side infrastructure, ensuring the backend systems function smoothly. This involves working with databases for user profiles and preferences, optimizing data queries, and ensuring data integrity for the voice assistant application.
+
+\medskip
+
+\noindent\textbf{Patrick Segedi}\\
+\textit{Software Developer (Back-end)}\\
+Develops the core voice processing pipeline, including audio stream handling, speech recognition integration, and command execution logic. Implements multi-user management systems, conflict resolution mechanisms, and role-based access control. Ensures efficient communication between voice assistant components and smart home devices while maintaining system security and reliability.
+
+\medskip
+
+\noindent\textbf{Hong Jinseo}\\
+\textit{Software Developer (Front-end)}\\
+Handles front-end development and user interface design. Focuses on creating a seamless user experience by designing intuitive interfaces for voice assistant configuration and monitoring. Implements the interface using React or similar frameworks, ensuring the application is visually appealing, functional, and easy to navigate across different devices.
+
+\medskip
+
+\noindent\textbf{Tae Hee Kim}\\
+\textit{Project Manager, UI/UX Designer}\\
+Oversees the development process, managing schedules, ensuring product quality, and coordinating the team to meet user requirements and expectations. Additionally handles UI/UX design, creating voice interaction flows and visual feedback systems that make the multi-user voice assistant intuitive and accessible for all family members.
+
+\section{Introduction}
+
+\subsection{Motivation}
+In the rapidly evolving world of smart home technology, three key elements -- personalization, privacy, and contextual intelligence -- are shaping the way users experience their connected environments. As smart devices become more widespread in households around the world, people now expect more than just automation or convenience. They want technologies that can recognize their individual habits, respond to their unique preferences, and adjust seamlessly to different situations within their daily lives. This growing demand highlights the importance of creating smart home systems that not only function efficiently but also feel intuitive, secure, and personally meaningful to each user.
+
+As a global leader in home electronics, LG has been driving innovation in smart living through its LG ThinQ platform, which continues to expand and integrate a wide range of connected home devices. Despite these advancements, most existing voice assistants still depend heavily on cloud-based systems and deliver uniform responses. This approach does not align with LG’s goal of creating AI that understands people personally and adapts intelligently to their situations. In many households, several individuals interact with the same smart devices. However, current assistants often struggle to distinguish between users or adjust their responses based on the surrounding context, resulting in generic interactions rather than personalized experiences. To bridge this gap and support LG’s vision of ``Innovation for a Better Life,'' our team would like to develop a Speaker-Adaptive Voice Assistant (SAVA). The system will recognize each user, ensure privacy through on-device processing, and create a more seamless smart home experience.
+
+\subsection{Problem Statement}
+Existing voice assistants still lack effective multi-user personalization. Although technologies exist to distinguish between individual users, current voice assistants rarely apply them effectively. This limitation leads to generic responses or actions that fail to cater to each other’s unique needs. Additionally, current systems depend heavily on cloud-based processing. This raises privacy concerns because personal data, such as voice patterns and behavioral information, is transmitted to external servers. In households with multiple users, this leads to functional and ethical problems: users may be misidentified, commands may conflict, and sensitive data could be exposed.
+
+Moreover, current assistants have limited abilities to provide personalized content and support. For example, they cannot easily deliver age-appropriate content for children, offer tailored reminders or assistance for seniors, or adjust recommendations based on individual preferences and routines. They also struggle with understanding context over time, maintaining continuity in multi-step interactions, and integrating smoothly with multiple devices or ecosystems. Accessibility challenges further limit their usability for diverse user groups, and reliance on cloud processing can introduce both security and reliability concerns.
+
+Therefore, smart home environments need a more advanced voice assistant. It should be able to recognize each user, understand the context of interactions, and provide personalized content. At the same time, it must protect privacy and operate reliably across multiple devices. Such an assistant would not only make daily life more convenient but also improve the overall intelligence, safety, and accessibility of the connected home. To address these needs, we aim to develop a Speaker-Adaptive Voice Assistant that meets all these requirements.
+
+\section{Requirements}
+
+\subsection{A. Mobile Application}
+The system requires a mobile application that can securely manage user access and permissions through a role-based framework. Users can create an account by registering with their phone number, which is verified through an authentication process, and by setting a strong password that meets the required security standards. Once registered, each user is assigned a specific role that determines their level of access within the system. The administrator can create and manage user profiles, update information, and adjust permissions as needed. For example, a child user can be assigned a ``kid'' role, ensuring the voice assistant recognizes the user type and provides suitable content or responses. Regular users may have access to general system features, while guests are limited to basic viewing options. This structured approach allows for personalized and secure interaction, ensuring that each user’s experience and data protection are properly maintained.
+
+\subsection{B. Voice Assistant \& Services}
+The system’s voice assistant must be capable of recognizing and distinguishing users based on their voices. By analyzing the speaker’s voice, it can determine which user profile is currently interacting with the system and respond accordingly. For example, when the assistant detects the mother’s voice, it should identify it as belonging to the ``mother'' profile and automatically adjust the environment to her preferences -- such as changing the living room lighting to her preferred setting or playing her favorite genre of TV shows. Similarly, when it detects a child’s voice, the system should recognize it as the ``child'' profile and apply appropriate restrictions, such as denying a request to purchase games or preventing access to adult content. At the same time, it can provide kid-friendly content, ensuring a safe and personalized experience. Through this intelligent voice recognition, the system creates a customized and secure environment for every user.
+
+\section{Development Environment}
+
+\subsection{A. Choice of software development platform}
+
+\subsubsection*{a. Platforms}
+Our development environment will consist of Windows and macOS, as we have prior experience and proficiency with these systems.
+
+\begin{itemize}
+\item Windows: Our team selected Windows 11 as one of the primary development platforms due to its broad compatibility, stable performance for AI and embedded development, and robust ecosystem support. It also integrates seamlessly with our main software, including Python, PyTorch, and Fast-Whisper.
+\item Mac: We also selected macOS as a primary development platform for several important technical, design, and cross-platform reasons. MacOS meets our project needs by providing a stable, Unix-based foundation, powerful developer tools, and seamless support for our AI and design workflows. It functions well with all our core software, including Python, PyTorch, and Fast-Whisper, as well as Windows.
+\end{itemize}
+
+Our team used devices as follows:
+\begin{enumerate}
+\item Asus A14, AMD Ryzen 7 8845HS w/ Radeon 780M Graphics (3.80 GHz)
+\item MacBook Air, M3 chip, 16 GB, macOS Sequoia 15.7.1
+\item ASUS Zenbook 14 Flip OLED, 16 GB, Intel Core i7-1360P, Windows 11 Home 24H2
+\end{enumerate}
+
+\subsubsection*{b. Programming Languages}
+\begin{itemize}
+\item Python: Offering both simplicity and power, Python provides robust libraries and models for high-performance audio processing, speech recognition, and machine learning. Its key speaker verification model, SpeechBrain, is built on PyTorch, leveraging this Python-native framework for the efficient design and operation of deep neural networks.
+\item SQLite: This language will be utilized to store data locally on the device, such as voice samples, user profiles, or activation logs.
+\item JavaScript: The front end of the application will be built using JavaScript, which allows for creating interactive and dynamic user interfaces within the app.
+\end{itemize}
+
+\subsection{B. Software in Use}
+\begin{itemize}
+\item SpeechBrain: SpeechBrain is an open-source speech toolkit built on PyTorch, designed specifically for speech processing tasks. Our project incorporates the ECAPTA-TDNN (Emphasized Channel Attention, Propagation and Aggregation in TDNN) model. This model is pre-trained on the VoxCeleb dataset for robust speaker verification. By extracting speaker embeddings from audio, the model enables highly accurate speaker authentication using voice biometrics. The toolkit's modular design and comprehensive documentation make it ideal for implementing robust voice authentication systems.
+\item Faster-whisper: Faster Whisper is an optimized implementation of OpenAI's Whisper automatic speech recognition model. It uses CTranslate2 for efficient inference, providing up to 4x speedup compared to the original implementation while maintaining the same accuracy. In our system, it handles the speech-to-text conversion for wake word detection, accurately transcribing spoken commands to identify activation phrases.
+\item NumPy: NumPy serves as the fundamental package for scientific computing in Python. It provides support for large, multi-dimensional arrays and matrices, along with a collection of mathematical functions to operate on these arrays. In our audio processing pipeline, NumPy is essential for handling three core tasks: manipulating and transforming audio signals, extracting features from waveforms, and performing mathematical operations for similarity calculations.
+\item PyTorch: PyTorch is a deep learning framework that provides tensor computation with strong GPU acceleration and deep neural networks built on a tape-based autograd (automatic differentiation) system. While we do not directly use PyTorch for model training, it serves as the backend for SpeechBrain's speaker recognition models. Its dynamic computational graph and Pythonic nature make it ideal for research and production deployment.
+\item Soundfile: Soundfile is a Python library that interfaces with libsndfile to handle reading and writing audio formats, as WAV, FLAC, and OGG. In our project, it handles reading pre-recorded voice samples, writing recorded audio to disk, and converting audio formats.
+\item SoundDevice: SoundDevice provides bindings for the PortAudio library, and it allows real-time audio recording and playback. It offers low-latency audio I/O with minimal dependencies. Our system uses it for real-time audio recording from a microphone.
+\item Visual Studio Code: Visual Studio Code serves as our primary integrated development environment. Its lightweight architecture, combined with powerful features, makes it ideal for Python development.
+\item Notion: Notion functions as our all-in-one workspace for project documentation and knowledge management.
+\item Slack: Slack serves as our primary team communication platform, facilitating real-time collaboration.
+\end{itemize}
+
+\subsection{C. Task Distribution}
+Will be provided in the next phase.
+
+\section{Specifications}
+
+\subsection{A. Requirement 1 -- Mobile Application}
+
+\subsubsection*{a. Sign Up}
+Users can create an account and access features by signing up through the mobile app. Once signed up, their permissions determine access to additional capabilities, such as profile management and device linking.
+
+\begin{enumerate}
+\item For first-time usage, you must use the provided master key to access the app and create the admin profile.
+\item Enter phone number, which will be verified through an authentication system.
+\item Enter a password that meets the following criteria:
+\begin{itemize}
+\item Be at least 8 characters long.
+\item Include a mix of lower- and upper-case letters.
+\item Contain at least 1 number.
+\item Contain at least 1 special character.
+\end{itemize}
+\end{enumerate}
+
+\subsubsection*{b. Profile Management}
+User profiles with admin rights have access to the mobile app via their login credentials. They can create new accounts and fully manage existing ones.
+
+\subsubsection*{c. Profile Role Restrictions}
+There will be three different roles in our system.
+\begin{enumerate}
+\item Admin: Users assigned the ``Admin'' role can create and manage other profiles, and they can access every single feature of the system.
+\item User: Users assigned the ``User'' role can access the system’s general features, but they cannot create or manage other profiles. This is the only role that can be customized, for example, to accommodate special requirements like an underage user.
+\item Guest: Users with the ``Guest'' role can only use limited ``read'' functions.
+\end{enumerate}
+
+\subsection{B. Requirement 2 -- Speaker}
+
+\subsubsection*{a. Wake word detection with voice recognition}
+One of the main features of the system is Wake Word Detection with Voice Recognition. This function allows the assistant to activate when a specific keyword is spoken and then identify the speaker through voice recognition. Once identified, the system grants access to personalized features and delivers responses tailored to the individual user.
+
+\subsubsection*{b. Voice commands}
+The system allows users to interact naturally through voice commands, enabling hands-free control of smart home devices and personalized services.
+
+For the prototype, the system will demonstrate three main functions.
+\begin{enumerate}
+\item Opening and locking the door
+\item Turning on and off the TV
+\item Changing the light in the room
+\end{enumerate}
+
+In the future, the system can be easily expanded to include more features such as alarm setting, media playback, environmental control, and child-specific modes. This flexibility allows the assistant to grow and adapt to different household needs.
+
+\subsubsection*{c. Full Access / Limited Access}
+It allows users to set different access levels for each account. Parents can set their accounts to access all the commands and contents. They can also set up their children’s accounts to prevent access to adult content or inappropriate content.
+
+\subsubsection*{d. Speaker Adaptive \& Location Awareness}
+This function allows the assistant to understand the environment and location in which it operates. The system will include multiple speakers placed in different rooms. This enables detection of where the user is speaking from and responds accordingly, creating a more seamless and speaker-adaptive experience.
+
 
 \end{document}
