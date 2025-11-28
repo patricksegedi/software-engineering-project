@@ -1,0 +1,124 @@
+/* Layout */
+.admin-container {
+  min-height: 100vh;
+  padding: 40px;
+  background: #f8fafc;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #0f172a;
+}
+
+.admin-header {
+  margin-bottom: 28px;
+}
+
+.admin-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  margin: 0;
+}
+
+.admin-subtitle {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+/* Sections */
+.admin-section {
+  margin-bottom: 28px;
+}
+
+.admin-section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 12px;
+}
+
+.admin-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 12px;
+}
+
+/* Summary cards */
+.admin-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+  width: 210px;
+}
+
+.admin-card-label {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.admin-card-value {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.admin-card-desc {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+/* Activity list */
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* Management link cards */
+.admin-links-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.admin-link-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 18px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.03);
+  width: 220px;
+}
+
+.admin-link-card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.admin-link-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
