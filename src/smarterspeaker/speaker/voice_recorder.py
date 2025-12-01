@@ -1,6 +1,6 @@
 import sounddevice as sd
 import wavio
-from smarterspeaker.config import SAMPLE_RATE, RECORD_SECONDS, VOICE_INPUT
+from ..config import SAMPLE_RATE, RECORD_SECONDS, VOICE_INPUT
 
 class VoiceRecorder:
 

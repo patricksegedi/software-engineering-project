@@ -41,7 +41,13 @@ def main():
             
             if user is not None:
                 print(f"✅ Authentication successful: {user}")
+                # Play welcome sound
                 playsound(f"voice_samples/{user}/voices/valid.wav")
+                
+                # Add personalized greeting with TTS
+                greeting = f"Hello {user}, what can I help you with today?"
+                print(f"🤖 {greeting}")
+                tts_speak(greeting)
                 
                 # Enter command mode
                 print(f"\n🎯 {user}'s AI Assistant Mode")

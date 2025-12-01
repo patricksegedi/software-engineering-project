@@ -6,8 +6,8 @@ import numpy as np
 import os
 from pathlib import Path
 
-# smarterspeaker/
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Project root directory (소웨공_11_24)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
 
 class SpeakerVerifier:

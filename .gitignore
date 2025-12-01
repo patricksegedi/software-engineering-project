@@ -139,6 +139,7 @@ celerybeat.pid
 # Environments
 .env
 .envrc
+src/smarterspeaker/.env
 .venv
 env/
 venv/
