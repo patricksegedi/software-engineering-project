@@ -1,12 +1,12 @@
-from voice_recorder import VoiceRecorder
-from audio_to_text import AudioToText
-from wake_word_activation import WakeWordActivation
-from speaker_verification import SpeakerVerifier
-from gemini_ai import GeminiAI
-from permission_manager import PermissionManager
+from .speaker.voice_recorder import VoiceRecorder
+from .speaker.audio_to_text import AudioToText
+from .speaker.wake_word_activation import WakeWordActivation
+from .speaker.speaker_verification import SpeakerVerifier
+from .ai.gemini_ai import GeminiAI
+from .ai.permission_manager import PermissionManager
 # from tts import tts_speak  # 기존 TTS 모듈은 나중에 설정
 from playsound import playsound
-from config import THRESHOLD
+from .config import THRESHOLD
 import json
 import os
 from dotenv import load_dotenv
@@ -26,7 +26,7 @@ def main():
     audio_processor = AudioToText()
     voice_recorder = VoiceRecorder()
     
-    with open("users.json", "r") as file:
+    with open("src/smarterspeaker/users.JSON", "r") as file:
         users = json.load(file)
     
     while True:
@@ -50,7 +50,7 @@ def main():
                     
             else:
                 print("❌ Authentication failed!")
-                playsound("voices/invalid.mp3")
+                playsound("src/smarterspeaker/voices/invalid.mp3")
 
 def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_manager):
     """Continuous command processing mode"""

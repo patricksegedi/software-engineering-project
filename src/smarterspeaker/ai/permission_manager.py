@@ -5,7 +5,7 @@ from typing import Tuple, Dict, Optional
 class PermissionManager:
     """사용자별 권한 관리 시스템"""
     
-    def __init__(self, permissions_file="permissions.json"):
+    def __init__(self, permissions_file="src/smarterspeaker/ai/permissions.json"):
         self.permissions_file = permissions_file
         self.permissions = self._load_permissions()
     
