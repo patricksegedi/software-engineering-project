@@ -1,4 +1,4 @@
-from audio_to_text import AudioToText
+from smarterspeaker.speaker.audio_to_text import AudioToText
 
 class WakeWordActivation:
     def __init__(self, audio_to_text, keyword):
