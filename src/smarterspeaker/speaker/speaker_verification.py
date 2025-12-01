@@ -4,6 +4,11 @@ import soundfile as sf
 import torch
 import numpy as np
 import os
+from pathlib import Path
+
+# smarterspeaker/
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 class SpeakerVerifier:
 
@@ -50,7 +55,8 @@ class SpeakerVerifier:
         best_score = float('-inf')
 
         for username, folder in users.items():
-            score = self.best_match_for_folder(audio_file, folder)
+            folder_path = BASE_DIR / folder  # -> smarterspeaker/voice_samples/patrick
+            score = self.best_match_for_folder(audio_file, folder_path)
             print(f"[DEBUG] {username}: {score:.3f}")
 
             if score > best_score:
