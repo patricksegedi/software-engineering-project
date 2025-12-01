@@ -1,16 +1,28 @@
-# SmartER Speaker - Speaker-Adaptive Voice 
+# SmartER Speaker - Speaker-Adaptive Voice Assistant
 
-## 📌 Overview
-Modern smart homes typically rely on cloud-based voice assistants such as Alexa or Google Home, but they treat every household member the same. Our project aims to build a **Speaker-Adaptive Voice Assistant (SAVA)** that recognizes who is speaking, understands the context of commands, and delivers **personalized responses embedded with strong privacy protections**. The system identifies the speaker, determines their location in the house, and enforces role-based access control (e.g., parent vs. child), all while processing audio **locally on the device** to protect user privacy.
-
-When multiple users give conflicting commands, the system resolves them intelligently based on **priority rules and predefined permissions**. Our goal is to create a voice assistant that genuinely understands and adapts to each family member, improving safety, convenience, and personalization in smart home environments.
+**Group 8:** Jin Seo Hong, Ken Lee, Nick Ki Gumann, Patrick Segedi, Tae Hee Kim
 
 ---
 
-## 🧠 Key Features
-- 🎤 **Speaker Recognition** — Identifies individual users using voice biometrics
-- 🏠 **Location Awareness** — Determines which room commands originate from
-- 🔐 **On-Device Processing** — Protects privacy and prevents data leakage
-- 🧒👨‍👩‍👧 **Role-Based Access Control** — Different permissions for parents, children, and guests
-- ⚖️ **Conflict Resolution** — Handles overlapping commands using priority rules
-- 🏡 **Smart Home Control** — Lights, TV, door control, and expandable services
+## Introduction
+Smart home assistants, such as Alexa and Google Home, have become genuinely useful parts of our daily lives. But even at their best, they have a major limitation: they treat everyone in the house exactly the same. They do not know if you are a parent, a child, or a guest.
+
+We believe these assistants can be more than **just smart** -they should be personal. Our project, Smart**ER** Speaker, is designed to recognize who is speaking and adjust its behavior accordingly. It uses local processing to distinguish family members and provide them a personalized experience or even enforce safety rules - like preventing a child from turning on the TV in the middle of the night - all while keeping your private conversations inside the home, not in the cloud.
+
+Our goal is to create a voice assistant that genuinely understands and adapts to each family member, enhancing the safety, convenience, and personalization of the smart home experience.
+
+---
+
+## Main Features
+
+* **Speaker Recognition**
+    Identifies individual users using voice biometrics
+
+* **Location Awareness**
+    Determines which room commands originate from
+
+* **Role-Based Access Control**
+    Different permissions for parents, children, and guests
+
+* **Smart Home Control**
+    Lights, TV, door control, and expandable services
