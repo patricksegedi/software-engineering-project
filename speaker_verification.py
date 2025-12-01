@@ -1,4 +1,4 @@
-from speechbrain.inference import EncoderClassifier
+from speechbrain.inference.speaker import EncoderClassifier
 
 import soundfile as sf
 import torch
