@@ -1,6 +1,8 @@
 # test_user_repository.py
 import unittest
 from repositories.UserDboRepository import UserDboRepository
+from dotenv import load_dotenv
+import os
 from model.UserDbo import UserDbo   # adjust import if needed
 
 # 💡 Better: read from env vars or config in real projects
@@ -16,13 +18,16 @@ class test_user_repository(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+
+        load_dotenv()
+
         """Runs once before ALL tests."""
         cls.repo = UserDboRepository(
-            host=DB_HOST,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=DB_DATABASE,
-            port=DB_PORT
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_DATABASE"),
+            port=os.getenv("DB_PORT")
         )
 
     @classmethod
