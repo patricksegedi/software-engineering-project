@@ -11,13 +11,22 @@ class AudioToText:
         return text.translate(translator).lower()
 
     def transcribe(self, filename):
-        segments, info = self.model.transcribe(filename)
+        try:
+            print(f"🔍 Analyzing file: {filename}")
+            segments, info = self.model.transcribe(filename)
 
-        print(f"Detected language: {info.language} ({info.language_probability:.2f})")
-        print("Transcript:")
+            print(f"Detected language: {info.language} ({info.language_probability:.2f})")
+            print("Transcript:")
 
-        transcript = ""
-        for segment in segments:
-            print(f"[{segment.start:.2f}-{segment.end:.2f}] {segment.text}")
-            transcript += segment.text + " "
-        return self.clean_text(transcript.strip())
+            transcript = ""
+            for segment in segments:
+                print(f"[{segment.start:.2f}-{segment.end:.2f}] {segment.text}")
+                transcript += segment.text + " "
+            
+            result = self.clean_text(transcript.strip())
+            print(f"✅ Transcription complete: {result}")
+            return result
+            
+        except Exception as e:
+            print(f"❌ Whisper model error: {e}")
+            return ""
