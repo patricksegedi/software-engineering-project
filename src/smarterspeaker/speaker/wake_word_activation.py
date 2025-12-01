@@ -7,4 +7,8 @@ class WakeWordActivation:
 
     def is_activated(self, audio_file):
         text = self.audio_to_text.transcribe(audio_file)
-        return self.keyword in text
+        print(f"[DEBUG] Transcribed text: '{text}'")
+        print(f"[DEBUG] Looking for keyword: '{self.keyword}'")
+        result = self.keyword in text
+        print(f"[DEBUG] Wake word found: {result}")
+        return result
