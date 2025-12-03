@@ -3,9 +3,13 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
+from backend.utility.repositories.UserDboRepository import UserDboRepository
+from fastapi import HTTPException
 from pathlib import Path
 import json
 import shutil
+from dotenv import load_dotenv
+import os
 
 from .movies import search_movies  # 상대 import (같은 패키지)
 
@@ -271,5 +275,59 @@ def get_last_voice_search():
     React에서 폴링하거나, 디버깅용으로 사용할 수 있음.
     """
     return _last_voice_search
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class LoginResponse(BaseModel):
+    success: bool
+    message: str
+    name: Optional[str] = None
+    role: Optional[str] = None
+    email: Optional[str] = None
+    restriction_list: Optional[int] = None
+
+@app.post("/auth/login", response_model=LoginResponse)
+def login(payload: LoginRequest):
+    """
+    Login using email + password.
+    This checks the MySQL user using UserDboRepository.
+    """
+    repo = get_user_repo()
+
+    try:
+        user = repo.getUserByEmail(payload.email)
+    finally:
+        repo.close()
+
+    # Invalid email or wrong password
+    if not user or user.password != payload.password:
+        return LoginResponse(
+            success=False,
+            message="Invalid email or password"
+        )
+
+    # Successful login
+    return LoginResponse(
+        success=True,
+        message="Login successful",
+        name=user.name,
+        role=user.role,
+        email=user.email,
+        restriction_list=user.restriction_list,
+    )
+
+
+def get_user_repo():
+    load_dotenv()
+
+    return UserDboRepository(
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_DATABASE"),
+        port=os.getenv("DB_PORT")
+    )
 
 

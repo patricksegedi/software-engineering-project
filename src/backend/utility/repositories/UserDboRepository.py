@@ -43,6 +43,31 @@ class UserDboRepository:
         )
         self.conn.commit()
 
+    def getUserByEmail(self, email: str):
+        """
+        Returns a UserDbo object if a user exists with this email,
+        otherwise returns None.
+        """
+        query = """
+            SELECT name, role, email, phone_number, password, restriction_list
+            FROM t_user
+            WHERE email = %s
+        """
+        self.cursor.execute(query, (email,))
+        row = self.cursor.fetchone()
+    
+        if not row:
+            return None
+    
+        return UserDbo(
+            name=row["name"],
+            role=row["role"],
+            email=row["email"],
+            phone_number=row["phone_number"],
+            password=row["password"],
+            restriction_list=row.get("restriction_list"),
+        )
+
 
     def deleteUser(self, employee_id):
         query = "DELETE FROM t_user WHERE id = %s"
