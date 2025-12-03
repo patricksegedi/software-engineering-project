@@ -36,9 +36,20 @@ class SpeakerVerifier:
 
     def best_match_for_folder(self, recorded_file, folder_path):
         best_score = float('-inf')
-
-        for filename in os.listdir(folder_path):
-            if filename.lower().endswith(".wav"):
+        
+        # Check if folder exists
+        if not os.path.exists(folder_path):
+            print(f"[WARNING] Folder not found: {folder_path}")
+            return best_score
+        
+        try:
+            wav_files = [f for f in os.listdir(folder_path) if f.lower().endswith(".wav")]
+            
+            if not wav_files:
+                print(f"[INFO] No .wav files in {folder_path}")
+                return best_score
+                
+            for filename in wav_files:
                 sample_file = os.path.join(folder_path, filename)
                 score = self.score_sample(sample_file, recorded_file)
                 
@@ -46,6 +57,9 @@ class SpeakerVerifier:
 
                 if score > best_score:
                     best_score = score
+                    
+        except Exception as e:
+            print(f"[ERROR] Error processing {folder_path}: {e}")
 
         return best_score
     
