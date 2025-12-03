@@ -3,6 +3,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
+from .speaker.voice_recorder import VoiceRecorder
+from .speaker.audio_to_text import AudioToText
+from .speaker.wake_word_activation import WakeWordActivation
+from .speaker.speaker_verification import SpeakerVerifier
+from .speaker.speaker_active import speaker_activate
+from playsound import playsound
+from .config import THRESHOLD
 import json
 
 app = FastAPI()
@@ -122,3 +129,21 @@ def reset_voice_search():
     }
     print("[API] Voice query reset")
     return {"status": "reset"}
+    # Create single instances to avoid re-initialization
+    voice_recorder = VoiceRecorder()
+    audio_processor = AudioToText()
+    
+    while True:
+        recorded_file = voice_recorder.record()
+        wake = WakeWordActivation(audio_processor, "Hello")
+
+        if wake.is_activated("voice_sample.wav"):
+            user = SpeakerVerifier().identify_speaker(recorded_file, users, THRESHOLD)
+            if user is not None:
+                # Skip the first greeting - AI will handle it
+                speaker_activate(user, audio_processor, voice_recorder)
+                break
+            else:
+                invalid_path = BASE_DIR / "voices" / "invalid.mp3"
+                print("No activation!")
+                playsound(str(invalid_path))

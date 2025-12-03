@@ -48,6 +48,7 @@ def main():
                 success_sound = os.path.join(BASE_DIR, "voice_samples", user, "voices", "valid.wav")
                 print("[DEBUG] Playing success sound:", success_sound)
                 playsound(success_sound)
+                playsound(f"voice_samples/{user}/voices/valid.wav")
                 
                 # Add personalized greeting with TTS
                 greeting = f"Hello {user}, what can I help you with today?"
@@ -86,6 +87,7 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
             
              # Convert speech to text
                         # Convert speech to text
+            # Convert speech to text
             try:
                 print("🔄 Converting speech to text...")
                 command_text = audio_processor.transcribe(command_file)
@@ -222,6 +224,24 @@ def execute_action(action: Dict):
     except Exception as e:
         print("❗ Error updating device:", e)
 
+def execute_action(action: Dict):
+    """Execute AI generated action"""
+    action_type = action.get('type')
+    
+    if action_type == 'device_control':
+        print(f"🏠 Device control: {action}")
+        # TODO: Add actual IoT device control code
+        # Example: smart_home_api.control_device(action['device'], action['parameters'])
+        
+    elif action_type == 'weather_query':
+        print(f"☁️ Weather query: {action}")
+        # TODO: Add weather API call code
+        # Example: weather_api.get_weather(action['time'])
+        
+    elif action_type == 'music_play':
+        print(f"🎵 Music playback: {action}")
+        # TODO: Add music streaming API call
+        # Example: music_api.play(action['query'])
 
 def tts_speak(text: str):
     """Convert text to speech and play"""
