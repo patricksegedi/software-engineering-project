@@ -8,9 +8,12 @@ from .ai.permission_manager import PermissionManager
 from playsound import playsound
 from .config import THRESHOLD
 import json
+import requests
 import os
 from dotenv import load_dotenv
 from typing import Dict
+
+BASE_DIR = os.path.dirname(__file__)
 
 # 환경 변수 로드
 load_dotenv()
@@ -42,6 +45,9 @@ def main():
             if user is not None:
                 print(f"✅ Authentication successful: {user}")
                 # Play welcome sound
+                success_sound = os.path.join(BASE_DIR, "voice_samples", user, "voices", "valid.wav")
+                print("[DEBUG] Playing success sound:", success_sound)
+                playsound(success_sound)
                 playsound(f"voice_samples/{user}/voices/valid.wav")
                 
                 # Add personalized greeting with TTS
@@ -79,6 +85,8 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
             print("🎤 Please speak your command...")
             command_file = voice_recorder.record("command.wav", duration=5)
             
+             # Convert speech to text
+                        # Convert speech to text
             # Convert speech to text
             try:
                 print("🔄 Converting speech to text...")
@@ -86,6 +94,35 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
                 print(f"📝 Recognized command: {command_text}")
             except Exception as e:
                 print(f"❌ Speech conversion error: {e}")
+                continue
+
+            try:
+                print("🌐 Sending recognized text to movie search API...")
+                resp = requests.post(
+                    "http://127.0.0.1:8000/voice-search",
+                    json={"text": command_text, "user": user},  # 🔹 화자 이름도 같이 전송
+                    timeout=1.5,
+                )
+
+                if resp.ok:
+                    api_data = resp.json()
+                    allowed = api_data.get("allowed", True)
+                    reason = api_data.get("reason")
+
+                    # 🔒 나이 제한 걸린 경우: 스피커가 reason 읽어주고, 다음 명령으로 넘어감
+                    if not allowed:
+                        print("🚫 Movie blocked by age restriction:", reason)
+                        if reason:
+                            tts_speak(reason)
+                        else:
+                            tts_speak("Sorry, this movie is restricted due to your age.")
+                        # 이 명령은 여기서 끝. 아래 Gemini 처리로 내려가지 않음.
+                        continue
+                else:
+                    print(f"⚠️ Movie API returned status {resp.status_code}")
+            except Exception as e:
+                print(f"⚠️ Movie API connection error: {e}")
+
                 continue
             
             if not command_text.strip():
@@ -128,6 +165,64 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
         except KeyboardInterrupt:
             print(f"\n👋 {user} logged out.")
             break
+
+import requests
+
+BACKEND_URL = "http://127.0.0.1:8000"   # FastAPI 서버 주소
+
+def execute_action(action: Dict):
+    """Execute AI generated action"""
+
+    # Step 1: action 형식 확인
+    if action.get("type") != "device_control":
+        print("❗ Unknown action type:", action)
+        return
+
+    device_id = action.get("device_id")
+    operation = action.get("operation")   # "on" / "off" / "toggle"
+
+    if device_id is None:
+        print("❗ device_id not provided in action")
+        return
+
+    # Step 2: 현재 기기 상태 불러오기
+    try:
+        devices = requests.get(f"{BACKEND_URL}/devices").json()
+    except Exception as e:
+        print("❗ Could not load devices:", e)
+        return
+
+    dev_map = {d["id"]: d for d in devices}
+
+    if device_id not in dev_map:
+        print("❗ Device not found:", device_id)
+        return
+
+    current = dev_map[device_id]
+    current_status = current["status"]
+
+    # Step 3: 다음 상태 결정
+    if operation == "toggle":
+        if current["type"] == "door":
+            next_status = "unlocked" if current_status == "locked" else "locked"
+        else:
+            next_status = "off" if current_status == "on" else "on"
+    else:
+        next_status = operation   # on/off/locked/unlocked
+
+    # Step 4: 서버에 상태 업데이트 요청
+    try:
+        res = requests.post(
+            f"{BACKEND_URL}/devices/{device_id}",
+            json={"status": next_status},
+            timeout=3,
+        )
+        if res.status_code == 200:
+            print(f"✅ Device updated: id={device_id}, status={next_status}")
+        else:
+            print("❗ Update failed:", res.text)
+    except Exception as e:
+        print("❗ Error updating device:", e)
 
 def execute_action(action: Dict):
     """Execute AI generated action"""
