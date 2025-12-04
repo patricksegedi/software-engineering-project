@@ -1,0 +1,97 @@
+/* NavBar.css – 팔레트 적용 버전
+   #9B59B6  (primary purple)
+   #DF4461  (secondary pink/red)
+   #2C3E50  (dark text)
+   #F3E4DA  (bg beige)
+*/
+
+.nav-container {
+  width: 100%;
+  background: #F3E4DA; /* 전체 배경이랑 맞춤 */
+  border-bottom: 1px solid rgba(44, 62, 80, 0.12);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.05);
+}
+
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+/* 로고 텍스트 */
+.nav-logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: #9B59B6;        /* primary */
+  cursor: pointer;
+}
+
+.nav-logo:hover {
+  color: #DF4461;        /* secondary */
+}
+
+/* Links */
+.nav-links {
+  display: flex;
+  gap: 14px;
+}
+
+.nav-link {
+  font-size: 0.9rem;
+  color: #2C3E50;        /* 기본 텍스트는 다크 */
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  transition: 0.2s;
+}
+
+.nav-link:hover {
+  background: rgba(155, 89, 182, 0.12);  /* 연한 보라 배경 */
+  color: #9B59B6;
+}
+
+/* 활성 탭 */
+.nav-link-active {
+  background: rgba(155, 89, 182, 0.2);   /* 더 진한 보라 pill */
+  color: #9B59B6;
+  font-weight: 600;
+}
+
+/* Right side */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Demo user 배지 */
+.nav-user-badge {
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(223, 68, 97, 0.12);   /* 핑크 톤 배경 */
+  color: #DF4461;
+}
+
+/* Log out 버튼 */
+.nav-logout-btn {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(44, 62, 80, 0.25);
+  background: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2C3E50;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-logout-btn:hover {
+  background: #DF4461;
+  color: #ffffff;
+  border-color: #DF4461;
+}

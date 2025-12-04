@@ -1,0 +1,94 @@
+/* 전체 컨테이너 */
+.dash-container {
+  padding: 40px;
+  background: #F3E4DA; /* 베이지톤 */
+  min-height: 100vh;
+  color: #2C3E50; /* 딥 블루 */
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Header */
+.dash-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.dash-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #9B59B6; /* 보라 */
+}
+
+.dash-title:hover {
+  color: #DF4461; /* 핑크 강조 */
+}
+
+.dash-welcome {
+  margin-top: 6px;
+  font-size: 1rem;
+  color: #2C3E50;
+}
+
+/* Section Title */
+.dash-section-title {
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #9B59B6; /* 보라 */
+}
+
+/* Zone cards */
+.zone-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.zone-card {
+  background: white;
+  padding: 20px;
+  width: 180px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #2C3E50;
+}
+
+.zone-card:hover {
+  background: #F3E4DA; /* 베이지톤 하이라이트 */
+  scale: 1.02;
+}
+
+/* Device cards */
+.device-grid {
+  display: flex;
+  gap: 20px;
+}
+
+.device-card {
+  background: white;
+  padding: 20px;
+  width: 180px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  color: #2C3E50;
+}
+
+/* Buttons */
+.toggle-btn {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #9B59B6; /* 기본: 보라 */
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.toggle-btn:hover {
+  background: #DF4461; /* hover: 핑크 */
+}

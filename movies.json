@@ -1,0 +1,119 @@
+[
+  {
+    "id": 1,
+    "title": "Inception",
+    "genre": "SF",
+    "year": 2010,
+    "description": "A skilled thief enters the dreams of others to plant an idea deep in the subconscious.",
+    "ageRating": 13,
+    "posterUrl": "https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/1280x1280/products/2919271/5944675/MOVEB46211__19379.1679590452.jpg?c=2"
+  },
+  {
+    "id": 2,
+    "title": "Interstellar",
+    "genre": "SF",
+    "year": 2014,
+    "description": "A group of explorers travels through a wormhole in search of a new home for humanity.",
+    "ageRating": 13,
+    "posterUrl": "https://play-lh.googleusercontent.com/AdTbI0Cx1cIPqmyNWAKUDGU0WG2c0idkTdYvBTV2ziF6gF8qd1aEmqX4ZzDp5m3jtkXjRA"
+  },
+  {
+    "id": 3,
+    "title": "The Dark Knight",
+    "genre": "Action",
+    "year": 2008,
+    "description": "A vigilante faces a chaotic criminal mastermind who pushes the city to the edge.",
+    "ageRating": 13,
+    "posterUrl": "https://play-lh.googleusercontent.com/5ApgwKo_GwEtc5khfQFFe2iJnoIPtsMF1dEhn49rQn27pJK7DVgT4v9MyKMEO4xfKxKR"
+  },
+  {
+    "id": 4,
+    "title": "Blade Runner 2049",
+    "genre": "SF",
+    "year": 2017,
+    "description": "A young blade runner uncovers a secret that could change the balance between humans and replicants.",
+    "ageRating": 19,
+    "posterUrl": "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_.jpg"
+  },
+  {
+    "id": 5,
+    "title": "Mad Max: Fury Road",
+    "genre": "Action",
+    "year": 2015,
+    "description": "In a desert wasteland, a lone drifter and a rebel leader flee a tyrant in a high-speed chase.",
+    "ageRating": 19,
+    "posterUrl": "https://play-lh.googleusercontent.com/XujhcvV-Mt7BBheyIiY_yWaVZKutxuhZi17IXRvx2axroT4Y-yp0HRYsyQKNIuE9Cxwqaq9k5KeL-3eT1Ok6"
+  },
+  {
+    "id": 6,
+    "title": "La La Land",
+    "genre": "Romance",
+    "year": 2016,
+    "description": "An aspiring actress and a jazz musician fall in love while chasing their dreams in Los Angeles.",
+    "ageRating": 13,
+    "posterUrl": "https://upload.wikimedia.org/wikipedia/en/a/ab/La_La_Land_%28film%29.png"
+  },
+  {
+    "id": 7,
+    "title": "Your Name",
+    "genre": "Animation",
+    "year": 2016,
+    "description": "Two teenagers mysteriously begin switching bodies and form a connection across time and distance.",
+    "ageRating": 1,
+    "posterUrl": "https://image.tmdb.org/t/p/original/lnQgcyFgYLepIzbK87hr7QWuKER.jpg"
+  },
+  {
+    "id": 8,
+    "title": "Parasite",
+    "genre": "Thriller",
+    "year": 2019,
+    "description": "A poor family slowly infiltrates the life of a wealthy household with unexpected consequences.",
+    "ageRating": 19,
+    "posterUrl": "https://m.media-amazon.com/images/I/91KArYP03YL._AC_UF894,1000_QL80_.jpg"
+  },
+  {
+    "id": 9,
+    "title": "Whiplash",
+    "genre": "Drama",
+    "year": 2014,
+    "description": "A young drummer enters a brutal music program led by an intense and demanding instructor.",
+    "ageRating": 19,
+    "posterUrl": "https://i.etsystatic.com/18242346/r/il/c677fe/4443914363/il_fullxfull.4443914363_2ejs.jpg"
+  },
+  {
+    "id": 10,
+    "title": "The Grand Budapest Hotel",
+    "genre": "Comedy",
+    "year": 2014,
+    "description": "A legendary concierge and his lobby boy get caught up in a stolen painting and family feud.",
+    "ageRating": 19,
+    "posterUrl": "https://m.media-amazon.com/images/I/713kiC-8JhL._AC_UF894,1000_QL80_.jpg"
+  },
+  {
+    "id": 11,
+    "title": "Her",
+    "genre": "SF",
+    "year": 2013,
+    "description": "A lonely writer develops an unexpected relationship with an advanced operating system.",
+    "ageRating": 19,
+    "posterUrl": "https://artofthemovies.co.uk/cdn/shop/products/her_ds-os-resized-406675_72bbd040-e6f6-423e-81f9-cb33f6f41f25-240357.jpg?v=1689587509"
+  },
+  {
+    "id": 12,
+    "title": "John Wick",
+    "genre": "Action",
+    "year": 2014,
+    "description": "A retired hitman returns to the underworld seeking revenge after a personal loss.",
+    "ageRating": 17,
+    "posterUrl": "https://www.tallengestore.com/cdn/shop/products/JohnWick-KeanuReeves-HollywoodEnglishActionMoviePoster-1_23768ddc-f4ef-4524-a6bb-4a8707ec18d7.jpg?v=1649071582"
+  },
+  {
+    "id": 13,
+    "title": "Before Sunrise",
+    "genre": "Romance",
+    "year": 1995,
+    "description": "Two strangers meet on a train and spend one night walking and talking through a European city.",
+    "ageRating": 19,
+    "posterUrl": "https://lh4.googleusercontent.com/proxy/ZeORxBrpnO9z8rOjWOj3aiZp8TMjU9nCpOlOYLOBnYT_FZdb4agmZWDAZMDfm9H7NQYeQBbtf2yAj0Xh0t9NgrpLbySidgea2lED"
+  }
+]

@@ -1,0 +1,127 @@
+.zones-container {
+  padding: 40px;
+  background: #F3E4DA;
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  color: #2C3E50;
+}
+
+.zones-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #9B59B6;
+  margin: 0;
+}
+
+.zones-subtitle {
+  margin: 6px 0 20px;
+  font-size: 0.95rem;
+  color: rgba(44, 62, 80, 0.7);
+}
+
+/* Sections */
+.zones-section {
+  margin-bottom: 26px;
+}
+
+.zones-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2C3E50;
+  margin: 0 0 10px;
+}
+
+.zones-hint {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: rgba(44, 62, 80, 0.5);
+}
+
+/* Add form */
+.add-zone-form {
+  display: flex;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.zone-input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(44, 62, 80, 0.2);
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: #2C3E50;
+}
+
+.zone-input::placeholder {
+  color: rgba(44, 62, 80, 0.45);
+}
+
+.zone-input:focus {
+  outline: none;
+  border-color: #9B59B6;
+  box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.25);
+}
+
+/* Buttons 재사용 */
+.primary-btn {
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #DF4461, #9B59B6);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.primary-btn:hover {
+  filter: brightness(1.05);
+}
+
+.secondary-btn {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(155, 89, 182, 0.35);
+  background: rgba(155, 89, 182, 0.06);
+  color: #2C3E50;
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.secondary-btn:hover {
+  background: rgba(155, 89, 182, 0.12);
+}
+
+/* Zone list */
+.zones-list {
+  margin-top: 8px;
+  max-width: 480px;
+}
+
+.zone-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  box-shadow: 0 4px 10px rgba(44, 62, 80, 0.05);
+}
+
+.zone-name {
+  font-size: 0.95rem;
+  color: #2C3E50;
+}
+
+.zones-empty {
+  font-size: 0.9rem;
+  color: rgba(44, 62, 80, 0.55);
+  margin-top: 6px;
+}

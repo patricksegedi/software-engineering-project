@@ -1,0 +1,26 @@
+{
+    "patrick": {
+        "role": "admin",
+        "blocked_devices": [],
+        "allowed_categories": ["all"],
+        "description": "관리자 - 모든 권한"
+    },
+    "taehee": {
+        "role": "user", 
+        "blocked_devices": ["TV", "에어컨"],
+        "allowed_categories": ["music", "weather", "general"],
+        "description": "일반 사용자 - TV/에어컨 제어 제한"
+    },
+    "jinseo": {
+        "role": "user",
+        "blocked_devices": [],
+        "allowed_categories": ["music", "weather", "general", "smart_home"],
+        "description": "일반 사용자 - 모든 기능 사용 가능"
+    },
+    "kun": {
+        "role": "restricted",
+        "blocked_devices": ["TV", "에어컨", "난방기"],
+        "allowed_categories": ["music", "weather", "general"],
+        "description": "제한 사용자 - 스마트홈 제어 불가"
+    }
+}
