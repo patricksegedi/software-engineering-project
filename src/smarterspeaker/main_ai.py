@@ -1,4 +1,5 @@
 from .speaker.voice_recorder import VoiceRecorder
+from .smarthome_client import control_device
 from .speaker.audio_to_text import AudioToText
 from .speaker.wake_word_activation import WakeWordActivation
 from .speaker.speaker_verification import SpeakerVerifier
@@ -17,6 +18,81 @@ BASE_DIR = os.path.dirname(__file__)
 
 # 환경 변수 로드
 load_dotenv()
+
+
+# =========================================================
+#  스마트홈 제어 관련 헬퍼 함수들
+# =========================================================
+
+def handle_device_command(zone: str, device_type: str, action: str) -> None:
+    """
+    zone / device_type / action 값을 받아서
+    실제로 FastAPI 서버에 /device-control 요청을 보내는 함수.
+    """
+    print(f"[SPEAKER] control request: zone={zone}, type={device_type}, action={action}")
+    result = control_device(zone, device_type, action)
+    print(f"[SPEAKER] control result: {result}")
+
+
+def try_handle_smart_home(text: str) -> bool:
+    """
+    STT로 나온 전체 문장을 받아서
+    - zone
+    - device_type
+    - action
+    을 간단한 규칙으로 추출한 뒤,
+    세 개가 다 결정되면 handle_device_command를 호출한다.
+
+    처리했으면 True, 아니면 False 반환.
+    """
+
+    t = text.strip()
+    t_lower = t.lower()
+
+    zone = None
+    device_type = None
+    action = None
+
+    # ===== 1) 존 추출 =====
+    if "거실" in t or "living room" in t_lower:
+        zone = "Living"
+    elif "침실" in t or "안방" in t or "bedroom" in t_lower:
+        zone = "Bedroom"
+
+    # ===== 2) 기기 타입 추출 =====
+    if "불" in t or "전등" in t or "light" in t_lower:
+        device_type = "light"
+    elif "에어컨" in t or "aircon" in t_lower or "ac" in t_lower:
+        device_type = "ac"
+    elif "티비" in t or "tv" in t_lower:
+        device_type = "tv"
+    elif "문" in t or "door" in t_lower:
+        device_type = "door"
+
+    # ===== 3) 액션 추출 =====
+    if "켜" in t or "on" in t_lower:
+        action = "on"
+    elif "꺼" in t or "off" in t_lower:
+        action = "off"
+    elif "잠가" in t or "lock" in t_lower:
+        action = "lock"
+    elif "열어" in t or "unlock" in t_lower:
+        action = "unlock"
+
+    # 세 개 다 못 찾으면 스마트홈 명령이 아닌 걸로 간주
+    if not (zone and device_type and action):
+        return False
+
+    # ===== 4) 실제 제어 호출 =====
+    print(f"[SMART_HOME] zone={zone}, type={device_type}, action={action}")
+    handle_device_command(zone, device_type, action)
+
+    return True
+
+
+# =========================================================
+#  메인 / 커맨드 모드
+# =========================================================
 
 def main():
     # Initialize Gemini AI
@@ -45,9 +121,6 @@ def main():
             if user is not None:
                 print(f"✅ Authentication successful: {user}")
                 # Play welcome sound
-                success_sound = os.path.join(BASE_DIR, "voice_samples", user, "voices", "valid.wav")
-                print("[DEBUG] Playing success sound:", success_sound)
-                playsound(success_sound)
                 
                 # Add personalized greeting with TTS
                 greeting = f"Hello {user}, what can I help you with today?"
@@ -62,6 +135,7 @@ def main():
             else:
                 print("❌ Authentication failed!")
                 playsound("src/smarterspeaker/voices/invalid.mp3")
+
 
 def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_manager):
     """Continuous command processing mode"""
@@ -84,8 +158,7 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
             print("🎤 Please speak your command...")
             command_file = voice_recorder.record("command.wav", duration=5)
             
-             # Convert speech to text
-                        # Convert speech to text
+            # Convert speech to text
             try:
                 print("🔄 Converting speech to text...")
                 command_text = audio_processor.transcribe(command_file)
@@ -94,6 +167,13 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
                 print(f"❌ Speech conversion error: {e}")
                 continue
 
+            # 🔹 1차로 스마트홈 명령인지 먼저 체크
+            if try_handle_smart_home(command_text):
+                # 스마트홈 제어를 이미 수행했으므로,
+                # 영화 검색 / Gemini 처리로 내려가지 않고 다음 명령으로
+                continue
+
+            # 🔹 기존 영화 검색 API 호출
             try:
                 print("🌐 Sending recognized text to movie search API...")
                 resp = requests.post(
@@ -120,7 +200,6 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
                     print(f"⚠️ Movie API returned status {resp.status_code}")
             except Exception as e:
                 print(f"⚠️ Movie API connection error: {e}")
-
                 continue
             
             if not command_text.strip():
@@ -156,7 +235,7 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
             print("🔊 Playing audio response...")
             tts_speak(result['response'])
             
-            # Execute action
+            # Execute action (기존 device_id 방식)
             if result['action']:
                 execute_action(result['action'])
             
@@ -164,7 +243,10 @@ def command_mode(user: str, voice_recorder, audio_processor, gemini, permission_
             print(f"\n👋 {user} logged out.")
             break
 
-import requests
+
+# =========================================================
+#  기존 execute_action / TTS / 세션 관련 함수들
+# =========================================================
 
 BACKEND_URL = "http://127.0.0.1:8000"   # FastAPI 서버 주소
 
@@ -183,9 +265,9 @@ def execute_action(action: Dict):
         print("❗ device_id not provided in action")
         return
 
-    # Step 2: 현재 기기 상태 불러오기
+    # Step 2: 현재 기기 상태 불러오기 (DB 기준으로 보고 싶으면 여기도 /devices-db 로 바꿀 수 있음)
     try:
-        devices = requests.get(f"{BACKEND_URL}/devices").json()
+        devices = requests.get(f"{BACKEND_URL}/devices-db").json()
     except Exception as e:
         print("❗ Could not load devices:", e)
         return
@@ -208,15 +290,15 @@ def execute_action(action: Dict):
     else:
         next_status = operation   # on/off/locked/unlocked
 
-    # Step 4: 서버에 상태 업데이트 요청
+    # Step 4: 서버에 상태 업데이트 요청 👉 ✅ 여기만 핵심 변경
     try:
         res = requests.post(
-            f"{BACKEND_URL}/devices/{device_id}",
+            f"{BACKEND_URL}/devices-db/{device_id}",   # ✅ DB용 엔드포인트로 변경
             json={"status": next_status},
             timeout=3,
         )
         if res.status_code == 200:
-            print(f"✅ Device updated: id={device_id}, status={next_status}")
+            print(f"✅ Device updated (DB): id={device_id}, status={next_status}")
         else:
             print("❗ Update failed:", res.text)
     except Exception as e:
@@ -259,6 +341,7 @@ def tts_speak(text: str):
         print(f"❌ TTS error: {e}")
         print("💬 Text response: " + text)
 
+
 def start_ai_session_with_components(user: str, audio_processor, voice_recorder):
     """Start AI session with pre-initialized components"""
     print(f"[DEBUG] Starting AI session with existing components for user: {user}")
@@ -286,6 +369,7 @@ def start_ai_session_with_components(user: str, audio_processor, voice_recorder)
         print(f"[ERROR] Exception in start_ai_session_with_components: {e}")
         import traceback
         traceback.print_exc()
+
 
 def start_ai_session_with_existing_components(user: str, audio_processor=None, voice_recorder=None):
     """Start AI session for authenticated user with existing components"""
@@ -329,6 +413,7 @@ def start_ai_session_with_existing_components(user: str, audio_processor=None, v
         import traceback
         traceback.print_exc()
 
+
 def start_ai_session(user: str):
     """Start AI session for authenticated user"""
     print(f"[DEBUG] start_ai_session called for user: {user}")
@@ -370,6 +455,7 @@ def start_ai_session(user: str):
         print(f"[ERROR] Exception in start_ai_session: {e}")
         import traceback
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     main()

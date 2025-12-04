@@ -1,48 +1,48 @@
 # src/smarterspeaker/api.py
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import or_
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 from pathlib import Path
 import json
 import shutil
 
-from .movies import search_movies  # 상대 import (같은 패키지)
+# DB 관련 import
+from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
-app = FastAPI(
-    title="SmarterSpeaker Movie API",
-    version="0.2.0",
-)
+from .db import get_db
+from . import models, schemas
+from .movies import search_movies  # 영화 검색 모듈
 
-# CORS: React에서 호출할 수 있게 허용 (개발 단계라 * 허용)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# -------------------------------------------
+# 라우터 생성 (여기서는 FastAPI 앱을 만들지 않는다)
+# -------------------------------------------
+router = APIRouter()
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# === 유저 정보 로드 (age 포함) ===
+# -------------------------------------------
+# 기존 JSON 기반 유저 데이터 로드 (영화 검색용)
+# -------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent  # src/smarterspeaker
 USERS_PATH = BASE_DIR / "users.JSON"
 
 with open(USERS_PATH, "r", encoding="utf-8") as f:
-  USERS: Dict[str, Any] = json.load(f)
+    USERS: Dict[str, Any] = json.load(f)
 
-# ================================
-# 1) 스마트홈 디바이스 상태 API
-# ================================
+# =======================================================
+# 1) 기존: 스마트홈 디바이스 상태 API (in-memory)
+# =======================================================
 
 class Device(BaseModel):
     id: int
     name: str
     type: str
     zone: str
-    status: str  # "on" / "off" / "locked" / "unlocked"
+    status: str
 
-# 웹 대시보드와 맞추기 위해 기본 디바이스를 이렇게 잡음
+
 DEVICES: Dict[int, Device] = {
     1: Device(id=1, name="Living room lights", type="light", zone="Living Room", status="off"),
     2: Device(id=2, name="Living room TV",     type="tv",    zone="Living Room", status="off"),
@@ -52,42 +52,38 @@ DEVICES: Dict[int, Device] = {
     6: Device(id=6, name="Kids room lights",   type="light", zone="Kids Room",   status="off"),
 }
 
-@app.get("/devices", response_model=List[Device])
+@router.get("/devices", response_model=List[Device])
 def list_devices():
-    """집 안 기기 전체 상태 조회 (웹 대시보드에서 사용)"""
     return list(DEVICES.values())
 
 
 class DeviceUpdate(BaseModel):
-    status: str  # "on" / "off" / "locked" / "unlocked"
+    status: str
 
-@app.post("/devices/{device_id}", response_model=Device)
+
+@router.post("/devices/{device_id}", response_model=Device)
 def update_device(device_id: int, payload: DeviceUpdate):
-    """특정 기기 상태 변경 (웹/스피커 둘 다 여기로 요청)"""
     if device_id not in DEVICES:
         raise HTTPException(status_code=404, detail="Device not found")
 
     dev = DEVICES[device_id]
     dev.status = payload.status
 
-    # 🔌 여기서 실제 IoT 제어 (라즈베리파이, MQTT 등) 붙이면 됨
     print(f"[IOT] {dev.name} -> {dev.status}")
-
     return dev
 
-# ============================================
-# 2) 회원가입 정보 → 스피커 쪽 유저로 등록 API
-# ============================================
+
+# =======================================================
+# 2) 기존: 회원가입 정보를 users.JSON에 저장
+# =======================================================
 
 class UserRegisterRequest(BaseModel):
-    name: str  # 스피커가 부를 이름 (예: "patrick")
-    age: int   # 권한(미성년자 등)에 쓸 나이
+    name: str
+    age: int
 
-@app.post("/users/register")
+
+@router.post("/users/register")
 def register_user(body: UserRegisterRequest):
-    """
-    웹에서 회원가입할 때 스피커 유저 JSON(users.JSON)에 같이 저장
-    """
     name = body.name
 
     if name in USERS:
@@ -100,36 +96,28 @@ def register_user(body: UserRegisterRequest):
         "voice_dir": voice_dir,
     }
 
-    # 폴더 생성
-    voice_path = BASE_DIR / voice_dir
-    voice_path.mkdir(parents=True, exist_ok=True)
+    (BASE_DIR / voice_dir).mkdir(parents=True, exist_ok=True)
 
-    # JSON 파일에 다시 저장
     with open(USERS_PATH, "w", encoding="utf-8") as f:
         json.dump(USERS, f, ensure_ascii=False, indent=2)
 
     return {"name": name, "age": body.age, "voice_dir": voice_dir}
 
 
-# ============================================
-# 3) 웹에서 녹음한 음성 업로드 → 스피커에 저장
-# ============================================
+# =======================================================
+# 3) 기존: 웹에서 녹음 파일 업로드
+# =======================================================
 
-@app.post("/users/{name}/voice")
+@router.post("/users/{name}/voice")
 async def upload_voice_sample(name: str, file: UploadFile = File(...)):
-    """
-    웹에서 녹음한 음성을 업로드하면
-    src/smarterspeaker/voice_samples/{name}/ 안에 저장
-    """
     if name not in USERS:
         raise HTTPException(status_code=404, detail="Unknown user")
 
-    voice_dir_rel = USERS[name]["voice_dir"]  # 예: "voice_samples/kun"
+    voice_dir_rel = USERS[name]["voice_dir"]
     voice_dir = BASE_DIR / voice_dir_rel
     voice_dir.mkdir(parents=True, exist_ok=True)
 
     dest_path = voice_dir / file.filename
-
     with dest_path.open("wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
@@ -137,9 +125,13 @@ async def upload_voice_sample(name: str, file: UploadFile = File(...)):
     return {"ok": True, "path": str(dest_path)}
 
 
+# =======================================================
+# 4) 기존: 영화 검색 기능
+# =======================================================
+
 class VoiceSearchRequest(BaseModel):
-    text: str              # STT 결과 전체 문장
-    user: Optional[str] = None  # 화자 이름 (예: "kun", "patrick")
+    text: str
+    user: Optional[str] = None
 
 
 class VoiceSearchResult(BaseModel):
@@ -147,17 +139,13 @@ class VoiceSearchResult(BaseModel):
     query: str
     count: int
     results: List[Dict[str, Any]]
-    user: Optional[str] = None
+    user: Optional[str]
     allowed: bool
-    reason: Optional[str] = None
+    reason: Optional[str]
 
-@app.get("/movies")
+
+@router.get("/movies")
 def get_movies(q: str = ""):
-    """
-    Search movies by title.
-    - /movies          -> all movies
-    - /movies?q=Inception -> movies whose title contains 'Inception'
-    """
     results = search_movies(q)
     return {
         "query": q,
@@ -167,13 +155,7 @@ def get_movies(q: str = ""):
 
 
 def extract_query_from_text(text: str) -> str:
-    """
-    Very simple rule-based extractor.
-    e.g. "search Inception", "play the movie Interstellar"
-    -> "Inception", "Interstellar"
-    """
     t = text.strip()
-
     if not t:
         return ""
 
@@ -198,25 +180,18 @@ def extract_query_from_text(text: str) -> str:
 
 
 def get_user_age(username: Optional[str]) -> Optional[int]:
-    """users.JSON에서 age 가져오기"""
-    if not username:
-        return None
-
     info = USERS.get(username)
     if isinstance(info, dict):
         return info.get("age")
-    # 예전 구조(문자열 path만 있는 경우)면 age 없음
     return None
 
 
 def get_required_age(results: List[Dict[str, Any]]) -> int:
-    """검색된 영화들 중 가장 높은 ageRating 반환"""
     if not results:
         return 0
     return max(m.get("ageRating", 0) for m in results)
 
 
-# 마지막 음성 검색 결과를 메모리에 저장할 전역 변수
 _last_voice_search: Dict[str, Any] = {
     "raw_text": "",
     "query": "",
@@ -228,12 +203,8 @@ _last_voice_search: Dict[str, Any] = {
 }
 
 
-@app.post("/voice-search", response_model=VoiceSearchResult)
+@router.post("/voice-search", response_model=VoiceSearchResult)
 def voice_search(payload: VoiceSearchRequest):
-    """
-    음성 인식(STT) 결과 문장을 받아서, 영화 검색을 수행.
-    - body: {"text": "search Inception", "user": "kun"}
-    """
     global _last_voice_search
 
     raw_text = (payload.text or "").strip()
@@ -241,12 +212,11 @@ def voice_search(payload: VoiceSearchRequest):
     query = extract_query_from_text(raw_text)
     results = search_movies(query)
 
-    # --- 연령 제한 계산 ---
     user_age = get_user_age(user)
     required_age = get_required_age(results)
 
     allowed = True
-    reason: Optional[str] = None
+    reason = None
 
     if user_age is not None and required_age > 0 and user_age < required_age:
         allowed = False
@@ -264,12 +234,151 @@ def voice_search(payload: VoiceSearchRequest):
     return _last_voice_search
 
 
-@app.get("/voice-search", response_model=VoiceSearchResult)
+@router.get("/voice-search", response_model=VoiceSearchResult)
 def get_last_voice_search():
-    """
-    마지막으로 수행된 음성 영화 검색 결과를 반환.
-    React에서 폴링하거나, 디버깅용으로 사용할 수 있음.
-    """
     return _last_voice_search
 
 
+# =======================================================
+# 5) ⭐ 새로 추가된 DB 기반 API
+# =======================================================
+
+# ------------------------------
+# 회원가입 (DB 기반)
+# ------------------------------
+@router.post("/auth/signup", response_model=schemas.UserOut)
+def signup(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
+    exists = db.query(models.User).filter(models.User.email == user_in.email).first()
+    if exists:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    hashed_pw = pwd_context.hash(user_in.password)
+    user = models.User(
+        email=user_in.email,
+        hashed_password=hashed_pw,
+        age=user_in.age,
+        family_role=user_in.family_role,
+        is_admin=False,
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+# ------------------------------
+# Zones
+# ------------------------------
+@router.get("/zones", response_model=List[schemas.ZoneOut])
+def list_zones(db: Session = Depends(get_db)):
+    return db.query(models.Zone).order_by(models.Zone.order_index).all()
+
+
+@router.post("/zones", response_model=schemas.ZoneOut)
+def create_zone(zone_in: schemas.ZoneCreate, db: Session = Depends(get_db)):
+    zone = models.Zone(**zone_in.dict())
+    db.add(zone)
+    db.commit()
+    db.refresh(zone)
+    return zone
+
+
+# ------------------------------
+# Devices (DB 기반)
+# ------------------------------
+@router.get("/devices-db", response_model=List[schemas.DeviceOut])
+def list_devices_db(db: Session = Depends(get_db)):
+    return db.query(models.Device).all()
+
+
+@router.post("/devices-db", response_model=schemas.DeviceOut)
+def create_device(device_in: schemas.DeviceCreate, db: Session = Depends(get_db)):
+    h = models.Device(**device_in.dict())
+    db.add(h)
+    db.commit()
+    db.refresh(h)
+    return h
+
+
+@router.post("/devices-db/{device_id}", response_model=schemas.DeviceOut)
+def update_device_db(device_id: int, update: schemas.DeviceUpdate, db: Session = Depends(get_db)):
+    device = db.query(models.Device).filter(models.Device.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    if update.status:
+        device.status = update.status
+
+    db.commit()
+    db.refresh(device)
+    return device
+
+# ==========================================
+# 8) Device Control (AI 스피커 → DB 제어)
+# ==========================================
+
+class DeviceControlRequest(BaseModel):
+    zone: Optional[str] = None          # 예: "Living Room"
+    device_type: Optional[str] = None   # 예: "light", "tv", "ac", "door"
+    action: str                         # 예: "on", "off", "lock", "unlock"
+
+
+@router.post("/device-control", response_model=List[schemas.DeviceOut])
+def device_control(cmd: DeviceControlRequest, db: Session = Depends(get_db)):
+    """
+    AI 스피커가 자연어를 해석해서,
+    zone + device_type + action 형태로 보내주면
+    해당 존의 해당 타입 기기들을 DB에서 찾아 상태를 변경.
+    """
+
+    # 1) 기본 쿼리: Device + Zone join
+    query = db.query(models.Device).join(models.Zone)
+
+    # 2) zone 필터 (name 또는 display_name 에 포함되면 매칭)
+    if cmd.zone:
+        zone_like = f"%{cmd.zone}%"
+        query = query.filter(
+            or_(
+                models.Zone.name.ilike(zone_like),
+                models.Zone.display_name.ilike(zone_like),
+            )
+        )
+
+    # 3) device_type 필터
+    if cmd.device_type:
+        query = query.filter(models.Device.type == cmd.device_type)
+
+    devices = query.all()
+    if not devices:
+        raise HTTPException(status_code=404, detail="No matching devices found")
+
+    # 4) action -> status 매핑
+    action = cmd.action.lower()
+
+    def map_status(device_type: str, action: str) -> str:
+        if device_type in ["light", "tv", "ac"]:
+            if action in ["on", "turn_on", "켜", "켜줘"]:
+                return "on"
+            if action in ["off", "turn_off", "꺼", "꺼줘"]:
+                return "off"
+        if device_type == "door":
+            if action in ["lock", "잠가", "잠가줘"]:
+                return "locked"
+            if action in ["unlock", "열어", "열어줘"]:
+                return "unlocked"
+        # 기본값: 그냥 action 그대로 넣거나 기존 유지
+        return action
+
+    # 5) 각 디바이스 상태 업데이트
+    for dev in devices:
+        new_status = map_status(dev.type, action)
+        dev.status = new_status
+
+    db.commit()
+
+    # 6) 갱신된 상태 다시 읽어서 반환
+    for dev in devices:
+        db.refresh(dev)
+
+    return devices
