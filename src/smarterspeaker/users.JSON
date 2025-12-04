@@ -1,0 +1,30 @@
+{
+  "patrick": {
+    "age": 28,
+    "voice_dir": "voice_samples/patrick"
+  },
+  "taehee": {
+    "age": 17,
+    "voice_dir": "voice_samples/taehee"
+  },
+  "nick": {
+    "age": 22,
+    "voice_dir": "voice_samples/nick"
+  },
+  "jinseo": {
+    "age": 15,
+    "voice_dir": "voice_samples/jinseo"
+  },
+  "kun": {
+    "age": 15,
+    "voice_dir": "voice_samples/kun"
+  },
+  "daniel.js.hong": {
+    "age": 15,
+    "voice_dir": "voice_samples/daniel.js.hong"
+  },
+  "h0dduck0328": {
+    "age": 20,
+    "voice_dir": "voice_samples/h0dduck0328"
+  }
+}

@@ -1,0 +1,138 @@
+/* ============================
+   OVERRIDE BOOTSTRAP WITH THEME
+   ============================ */
+
+/* 전체 배경을 베이지로 */
+html, body, #root {
+  background-color: #F3E4DA !important;
+}
+
+/* 네비게이션 바 배경도 베이지로 */
+.navbar,
+.navbar-light,
+.navbar-expand,
+.bg-light {
+  background-color: #F3E4DA !important;
+  box-shadow: none !important;
+}
+
+/* 기본 텍스트 색상 (남색) */
+body, p, span, li {
+  color: #2C3E50 !important;
+}
+
+/* 큰 제목은 살짝 더 진하게 */
+h1, h2, h3, h4, h5 {
+  color: #2C3E50 !important;
+}
+
+/* 링크 색상 → 보라 / 호버 → 핑크 */
+a,
+.nav-link {
+  color: #9B59B6 !important;
+}
+
+a:hover,
+.nav-link:hover {
+  color: #DF4461 !important;
+}
+
+/* 현재 선택된 메뉴 pill */
+.nav-pills .nav-link.active,
+.nav-link.active {
+  background-color: rgba(155, 89, 182, 0.18) !important;
+  color: #9B59B6 !important;
+}
+
+/* 카드 배경은 흰색 유지 (대신 그림자 살짝) */
+.card,
+.zone-card,
+.device-card {
+  background-color: #ffffff !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 20px rgba(44, 62, 80, 0.15) !important;
+}
+
+/* 대시보드 섹션 제목 여백 조금 */
+h2 {
+  margin-top: 24px;
+}
+
+/* 메인 액션 버튼 (Turn on / Unlock 등) → 보라/핑크 테마 */
+.btn-primary,
+button.btn-primary {
+  background-color: #9B59B6 !important;
+  border-color: #9B59B6 !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover {
+  background-color: #DF4461 !important;
+  border-color: #DF4461 !important;
+}
+
+/* pill 모양 버튼들 (Demo user / Logout 같은 것) */
+.btn-outline-primary,
+button.btn-outline-primary {
+  color: #9B59B6 !important;
+  border-color: #9B59B6 !important;
+  background-color: rgba(155, 89, 182, 0.08) !important;
+}
+
+.btn-outline-primary:hover,
+button.btn-outline-primary:hover {
+  color: #ffffff !important;
+  background-color: #DF4461 !important;
+  border-color: #DF4461 !important;
+}
+
+/* ==== BRAND & LINK COLOR FIX ==== */
+
+/* 상단 좌측 SmartHome 로고 텍스트 */
+.navbar-brand {
+  color: #9B59B6 !important;          /* 보라 */
+  font-weight: 700;
+}
+
+.navbar-brand:hover {
+  color: #DF4461 !important;          /* 핑크 */
+}
+
+/* 혹시 .text-primary 쓰는 곳도 전부 보라로 */
+.text-primary {
+  color: #9B59B6 !important;
+}
+
+/* ==== BUTTON COLOR FIX ==== */
+
+/* 기본 primary 버튼 (Turn on / Unlock 등) */
+.btn-primary,
+button.btn-primary {
+  background-color: #9B59B6 !important;  /* 보라 */
+  border-color: #9B59B6 !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+button.btn-primary:hover,
+.btn-primary:focus,
+button.btn-primary:focus {
+  background-color: #DF4461 !important;  /* 핑크 */
+  border-color: #DF4461 !important;
+  color: #ffffff !important;
+}
+
+/* 혹시 outline 타입 버튼도 있을 수 있어서 같이 처리 */
+.btn-outline-primary,
+button.btn-outline-primary {
+  color: #9B59B6 !important;
+  border-color: #9B59B6 !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover,
+button.btn-outline-primary:hover {
+  color: #ffffff !important;
+  background-color: #DF4461 !important;
+  border-color: #DF4461 !important;
+}

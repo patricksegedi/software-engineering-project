@@ -1,0 +1,80 @@
+/* src/Auth.css */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg); /* 베이지 배경 */
+}
+
+.auth-card {
+  background: var(--color-white);
+  padding: 32px 36px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(44, 62, 80, 0.2); /* 네이비 그림자 */
+  width: 360px;
+}
+
+.auth-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--color-dark);
+}
+
+.auth-subtitle {
+  font-size: 0.9rem;
+  color: rgba(44, 62, 80, 0.7);
+  margin-bottom: 16px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-label {
+  font-size: 0.85rem;
+  color: var(--color-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.auth-input {
+  border-radius: 10px;
+  border: 1px solid rgba(44, 62, 80, 0.25);
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+
+/* 버튼: 레드→보라 그라데이션 */
+.auth-button {
+  margin-top: 8px;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #DF4461, #9B59B6);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-button:hover {
+  opacity: 0.95;
+}
+
+.auth-toggle {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: rgba(44, 62, 80, 0.7);
+}
+
+.auth-link {
+  margin-left: 4px;
+  color: #DF4461; /* 포인트 레드 */
+  text-decoration: none;
+  font-weight: 500;
+}
