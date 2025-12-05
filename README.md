@@ -38,9 +38,9 @@ Currently, we offer the following features in our system:
 ---
 
 ## Trailor Video
-Watch our trailor video by clicking the image below.
+Watch our trailor video by clicking the image below.\
 [![Video Label](http://img.youtube.com/vi/-ynqgneOUV8/0.jpg)](https://youtu.be/-ynqgneOUV8)
 
 ## Demo Video
-Watch our demo implementation video by clicking the image below.
+Watch our demo implementation video by clicking the image below.\
 [![Video Label](http://img.youtube.com/vi/jxZdxNKbU_A/0.jpg)](https://youtu.be/jxZdxNKbU_A)
