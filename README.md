@@ -1,5 +1,12 @@
 # SmartER Speaker - Speaker-Adaptive Voice Assistant
-**Group 8:** Jin Seo Hong, Ken Lee, Nick Ki Gumann, Patrick Segedi, Tae Hee Kim
+**Group 8:** 
+
+## Our Team
+Jin Seo Hong: Frontend Developer
+Ken Lee: Ai Developer
+Nick Ki Gumann: Backend Developer
+Patrick Segedi: Pipeline Developer
+Tae Hee Kim: Project Manager, UI/UX Designer
 
 ---
 
@@ -14,6 +21,8 @@ Our goal is to create a voice assistant that genuinely understands and adapts to
 
 ## Main Features
 
+Currently, we offer the following features in our system:
+
 * **Speaker Recognition**
     Identifies individual users using voice biometrics
 
@@ -25,3 +34,13 @@ Our goal is to create a voice assistant that genuinely understands and adapts to
 
 * **Smart Home Control**
     Lights, TV, door control, and expandable services
+
+---
+
+## Trailor Video
+Watch our trailor video by clicking the image below.
+[![Video Label](http://img.youtube.com/vi/-ynqgneOUV8/0.jpg)](https://youtu.be/-ynqgneOUV8)
+
+## Demo Video
+Watch our demo implementation video by clicking the image below.
+[![Video Label](http://img.youtube.com/vi/jxZdxNKbU_A/0.jpg)](https://youtu.be/jxZdxNKbU_A)
