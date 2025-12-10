@@ -87,3 +87,26 @@ export function addUser({ email, password, role = "user", familyRole = "Member" 
 export function updateUsers(updatedUsers) {
   writeUsers(updatedUsers)
 }
+
+// --- 새로 추가: 로그인 상태 저장용 ---
+
+const AUTH_KEY = "smarthome_auth_user"
+
+export function saveAuthUser(user) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(user))
+}
+
+export function getAuthUser() {
+  const raw = localStorage.getItem(AUTH_KEY)
+  if (!raw) return null
+  try {
+    return JSON.parse(raw)
+  } catch (e) {
+    console.error("Failed to parse auth user", e)
+    return null
+  }
+}
+
+export function clearAuthUser() {
+  localStorage.removeItem(AUTH_KEY)
+}

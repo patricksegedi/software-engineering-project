@@ -1,38 +1,39 @@
 # src/smarterspeaker/api.py
 from sqlalchemy import or_
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, UploadFile, File, HTTPException, Depends, Response
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 from pathlib import Path
-import json
-import shutil
-
-# DB 관련 import
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
+from .config import MASTER_KEY   
 
+from io import BytesIO
+from pydub import AudioSegment
+from .db import DATABASE_URL
 from .db import get_db
 from . import models, schemas
 from .movies import search_movies  # 영화 검색 모듈
 
-# -------------------------------------------
-# 라우터 생성 (여기서는 FastAPI 앱을 만들지 않는다)
-# -------------------------------------------
+import json
+
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256", "bcrypt"],
+    deprecated="auto",
+)
+MAX_PASSWORD_LEN = 72
+
+app = FastAPI()
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+VOICE_DIR = Path(__file__).resolve().parent / "voices"
+VOICE_DIR.mkdir(exist_ok=True)
 
-# -------------------------------------------
-# 기존 JSON 기반 유저 데이터 로드 (영화 검색용)
-# -------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent  # src/smarterspeaker
-USERS_PATH = BASE_DIR / "users.JSON"
-
-with open(USERS_PATH, "r", encoding="utf-8") as f:
-    USERS: Dict[str, Any] = json.load(f)
+BASE_DIR = Path(__file__).resolve().parent
 
 # =======================================================
-# 1) 기존: 스마트홈 디바이스 상태 API (in-memory)
+# 1) (구현 그대로 사용) 인메모리 디바이스 API
+#    -> 프론트에서 이걸 안 써도 상관 없음
 # =======================================================
 
 class Device(BaseModel):
@@ -51,6 +52,12 @@ DEVICES: Dict[int, Device] = {
     5: Device(id=5, name="Bedroom lights",     type="light", zone="Bedroom",     status="off"),
     6: Device(id=6, name="Kids room lights",   type="light", zone="Kids Room",   status="off"),
 }
+
+
+@router.get("/debug/db")
+def debug_db():
+    return {"DATABASE_URL": DATABASE_URL}
+
 
 @router.get("/devices", response_model=List[Device])
 def list_devices():
@@ -74,63 +81,75 @@ def update_device(device_id: int, payload: DeviceUpdate):
 
 
 # =======================================================
-# 2) 기존: 회원가입 정보를 users.JSON에 저장
+# 2) 프로필 음성 업로드 (DB: user_voice_profiles.voice_blob 사용)
 # =======================================================
 
-class UserRegisterRequest(BaseModel):
-    name: str
-    age: int
+@router.post("/users/{user_id}/voice-profile")
+async def upload_voice_profile(
+    user_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    """
+    프로필 페이지에서 업로드한 음성을 DB BLOB으로 저장.
+    - 프론트에서 audio/webm 으로 올라오면 webm -> wav 로 변환해서 저장
+    - 이미 wav 인 경우에는 그대로 저장
+    """
 
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-@router.post("/users/register")
-def register_user(body: UserRegisterRequest):
-    name = body.name
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="Empty file")
 
-    if name in USERS:
-        raise HTTPException(status_code=400, detail="User already exists")
+    content_type = file.content_type or ""
 
-    voice_dir = f"voice_samples/{name}"
+    try:
+        # 🔥 1) webm 으로 올라온 경우: pydub + ffmpeg 로 wav 변환
+        if "webm" in content_type or file.filename.endswith(".webm"):
+            buf = BytesIO(raw)
+            audio = AudioSegment.from_file(buf, format="webm")
 
-    USERS[name] = {
-        "age": body.age,
-        "voice_dir": voice_dir,
-    }
+            audio = audio.set_channels(1).set_frame_rate(16000)
+            
+            wav_io = BytesIO()
+            audio.export(wav_io, format="wav")
+            wav_bytes = wav_io.getvalue()
+        else:
+            # 🔥 2) 이미 wav 로 올라온 경우: 그대로 저장
+            wav_bytes = raw
 
-    (BASE_DIR / voice_dir).mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to decode audio: {e}",
+        )
 
-    with open(USERS_PATH, "w", encoding="utf-8") as f:
-        json.dump(USERS, f, ensure_ascii=False, indent=2)
+    profile = (
+        db.query(models.UserVoiceProfile)
+        .filter(models.UserVoiceProfile.user_id == user_id)
+        .first()
+    )
 
-    return {"name": name, "age": body.age, "voice_dir": voice_dir}
+    if profile is None:
+        profile = models.UserVoiceProfile(user_id=user_id, voice_blob=wav_bytes)
+        db.add(profile)
+    else:
+        profile.voice_blob = wav_bytes
 
+    db.commit()
+    return {"message": "Voice profile saved", "user_id": user_id}
 
 # =======================================================
-# 3) 기존: 웹에서 녹음 파일 업로드
-# =======================================================
-
-@router.post("/users/{name}/voice")
-async def upload_voice_sample(name: str, file: UploadFile = File(...)):
-    if name not in USERS:
-        raise HTTPException(status_code=404, detail="Unknown user")
-
-    voice_dir_rel = USERS[name]["voice_dir"]
-    voice_dir = BASE_DIR / voice_dir_rel
-    voice_dir.mkdir(parents=True, exist_ok=True)
-
-    dest_path = voice_dir / file.filename
-    with dest_path.open("wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-
-    print(f"[VOICE] Saved sample for {name} at {dest_path}")
-    return {"ok": True, "path": str(dest_path)}
-
-
-# =======================================================
-# 4) 기존: 영화 검색 기능
+# 3) 영화 검색 + 나이 제한 (이제 JSON 말고 DB 기반)
 # =======================================================
 
 class VoiceSearchRequest(BaseModel):
     text: str
+    # main_ai.py 에서 email 문자열을 넘겨주고 있으므로
+    # 여기서도 user = 이메일 로 취급
     user: Optional[str] = None
 
 
@@ -179,11 +198,13 @@ def extract_query_from_text(text: str) -> str:
     return t
 
 
-def get_user_age(username: Optional[str]) -> Optional[int]:
-    info = USERS.get(username)
-    if isinstance(info, dict):
-        return info.get("age")
-    return None
+def get_user_age_from_db(email: Optional[str], db: Session) -> Optional[int]:
+    if not email:
+        return None
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if not user:
+        return None
+    return user.age
 
 
 def get_required_age(results: List[Dict[str, Any]]) -> int:
@@ -204,7 +225,11 @@ _last_voice_search: Dict[str, Any] = {
 
 
 @router.post("/voice-search", response_model=VoiceSearchResult)
-def voice_search(payload: VoiceSearchRequest):
+def voice_search(payload: VoiceSearchRequest, db: Session = Depends(get_db)):
+    """
+    main_ai.py 에서 인식된 자연어 명령(text)과 화자 email(user)을 받아
+    영화 검색 + 나이 제한 체크를 수행.
+    """
     global _last_voice_search
 
     raw_text = (payload.text or "").strip()
@@ -212,7 +237,7 @@ def voice_search(payload: VoiceSearchRequest):
     query = extract_query_from_text(raw_text)
     results = search_movies(query)
 
-    user_age = get_user_age(user)
+    user_age = get_user_age_from_db(user, db)
     required_age = get_required_age(results)
 
     allowed = True
@@ -240,25 +265,37 @@ def get_last_voice_search():
 
 
 # =======================================================
-# 5) ⭐ 새로 추가된 DB 기반 API
+# 4) 회원가입 / 로그인 / 유저 관리 (DB 기반)
 # =======================================================
 
-# ------------------------------
-# 회원가입 (DB 기반)
-# ------------------------------
 @router.post("/auth/signup", response_model=schemas.UserOut)
 def signup(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
+    # 비밀번호 길이 체크
+    if user_in.password and len(user_in.password.encode("utf-8")) > MAX_PASSWORD_LEN:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Password too long (max {MAX_PASSWORD_LEN} bytes).",
+        )
+
+    # 이메일 중복 확인
     exists = db.query(models.User).filter(models.User.email == user_in.email).first()
     if exists:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    # ✅ 마스터키 기반 admin 여부 결정
+    # - 비어 있으면 None 또는 "" → False
+    # - MASTER_KEY와 같으면 True
+    is_admin = bool(user_in.master_key and user_in.master_key == MASTER_KEY)
+
     hashed_pw = pwd_context.hash(user_in.password)
+
     user = models.User(
         email=user_in.email,
+        name=user_in.name,                   # ✅ 이름 저장
         hashed_password=hashed_pw,
         age=user_in.age,
         family_role=user_in.family_role,
-        is_admin=False,
+        is_admin=is_admin,                   # ✅ admin 여부 반영
     )
 
     db.add(user)
@@ -267,9 +304,61 @@ def signup(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     return user
 
 
-# ------------------------------
-# Zones
-# ------------------------------
+
+@router.get("/users", response_model=List[schemas.UserOut])
+def list_users(db: Session = Depends(get_db)):
+    """
+    전체 사용자 목록 조회 (관리자 페이지용)
+    """
+    users = db.query(models.User).order_by(models.User.id.desc()).all()
+    return users
+
+
+@router.delete("/users/{user_id}", status_code=204)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    사용자 삭제 (관리자 페이지에서 계정 지울 때 사용)
+    """
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.delete(user)
+    db.commit()
+    return Response(status_code=204)
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+@router.post("/auth/login", response_model=schemas.UserOut)
+def login(login_req: LoginRequest, db: Session = Depends(get_db)):
+    """
+    이메일 + 비밀번호 로그인.
+    해시 검증은 passlib CryptContext 사용 (pbkdf2_sha256 / bcrypt 둘 다 지원).
+    """
+    if login_req.password and len(login_req.password.encode("utf-8")) > MAX_PASSWORD_LEN:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Password too long (max {MAX_PASSWORD_LEN} bytes).",
+        )
+
+    user = db.query(models.User).filter(models.User.email == login_req.email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    if not pwd_context.verify(login_req.password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    return user
+
+
+# =======================================================
+# 5) Zones (DB)
+# =======================================================
+
 @router.get("/zones", response_model=List[schemas.ZoneOut])
 def list_zones(db: Session = Depends(get_db)):
     return db.query(models.Zone).order_by(models.Zone.order_index).all()
@@ -284,9 +373,24 @@ def create_zone(zone_in: schemas.ZoneCreate, db: Session = Depends(get_db)):
     return zone
 
 
-# ------------------------------
-# Devices (DB 기반)
-# ------------------------------
+@router.delete("/zones/{zone_id}", status_code=204)
+def delete_zone(zone_id: int, db: Session = Depends(get_db)):
+    zone = db.query(models.Zone).filter(models.Zone.id == zone_id).first()
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone not found")
+
+    # 해당 존에 속한 디바이스들도 같이 삭제
+    db.query(models.Device).filter(models.Device.zone_id == zone_id).delete()
+
+    db.delete(zone)
+    db.commit()
+    return Response(status_code=204)
+
+
+# =======================================================
+# 6) Devices (DB)
+# =======================================================
+
 @router.get("/devices-db", response_model=List[schemas.DeviceOut])
 def list_devices_db(db: Session = Depends(get_db)):
     return db.query(models.Device).all()
@@ -314,9 +418,21 @@ def update_device_db(device_id: int, update: schemas.DeviceUpdate, db: Session =
     db.refresh(device)
     return device
 
-# ==========================================
-# 8) Device Control (AI 스피커 → DB 제어)
-# ==========================================
+
+@router.delete("/devices-db/{device_id}", status_code=204)
+def delete_device_db(device_id: int, db: Session = Depends(get_db)):
+    device = db.query(models.Device).filter(models.Device.id == device_id).first()
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+
+    db.delete(device)
+    db.commit()
+    return Response(status_code=204)
+
+
+# =======================================================
+# 7) Device Control (AI 스피커 → DB 상태 제어)
+# =======================================================
 
 class DeviceControlRequest(BaseModel):
     zone: Optional[str] = None          # 예: "Living Room"
@@ -332,10 +448,8 @@ def device_control(cmd: DeviceControlRequest, db: Session = Depends(get_db)):
     해당 존의 해당 타입 기기들을 DB에서 찾아 상태를 변경.
     """
 
-    # 1) 기본 쿼리: Device + Zone join
     query = db.query(models.Device).join(models.Zone)
 
-    # 2) zone 필터 (name 또는 display_name 에 포함되면 매칭)
     if cmd.zone:
         zone_like = f"%{cmd.zone}%"
         query = query.filter(
@@ -345,7 +459,6 @@ def device_control(cmd: DeviceControlRequest, db: Session = Depends(get_db)):
             )
         )
 
-    # 3) device_type 필터
     if cmd.device_type:
         query = query.filter(models.Device.type == cmd.device_type)
 
@@ -353,7 +466,6 @@ def device_control(cmd: DeviceControlRequest, db: Session = Depends(get_db)):
     if not devices:
         raise HTTPException(status_code=404, detail="No matching devices found")
 
-    # 4) action -> status 매핑
     action = cmd.action.lower()
 
     def map_status(device_type: str, action: str) -> str:
@@ -367,18 +479,17 @@ def device_control(cmd: DeviceControlRequest, db: Session = Depends(get_db)):
                 return "locked"
             if action in ["unlock", "열어", "열어줘"]:
                 return "unlocked"
-        # 기본값: 그냥 action 그대로 넣거나 기존 유지
         return action
 
-    # 5) 각 디바이스 상태 업데이트
     for dev in devices:
         new_status = map_status(dev.type, action)
         dev.status = new_status
 
     db.commit()
 
-    # 6) 갱신된 상태 다시 읽어서 반환
     for dev in devices:
         db.refresh(dev)
 
     return devices
+
+app.include_router(router)
