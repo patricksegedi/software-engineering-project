@@ -3,21 +3,31 @@ import "../Auth.css"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../AuthContext"
 
+<input
+  type="password"
+  name="password"
+  className="auth-input"
+  required
+  maxLength={72}
+/>
+
 export default function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
     const email = formData.get("email")
     const password = formData.get("password")
 
     try {
-      login(email, password)
-      navigate("/dashboard")
+      // FastAPI /auth/login 호출 (AuthContext에서 처리됨)
+      await login(email, password)
+      navigate("/dashboard") // 너가 쓰던 대시보드 경로 유지
     } catch (err) {
-      alert("Invalid email or password. (Demo DB)")
+      console.error(err)
+      alert("로그인에 실패했습니다. 이메일/비밀번호를 확인해주세요.")
     }
   }
 
@@ -58,3 +68,5 @@ export default function Login() {
     </div>
   )
 }
+
+

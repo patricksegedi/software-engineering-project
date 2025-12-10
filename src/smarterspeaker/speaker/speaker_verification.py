@@ -1,5 +1,8 @@
 from speechbrain.inference import EncoderClassifier
+from speechbrain.pretrained import SpeakerRecognition
+from speechbrain.utils.fetching import LocalStrategy
 
+import json
 import soundfile as sf
 import torch
 import numpy as np
@@ -9,6 +12,12 @@ from pathlib import Path
 # smarterspeaker/ (루트)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+_ecapa = SpeakerRecognition.from_hparams(
+    source="speechbrain/spkrec-ecapa-voxceleb",
+    savedir="pretrained_models/spkrec-ecapa-voxceleb",
+    # 🔥 윈도우에서 symlink 못 쓰니까 그냥 복사 전략으로 강제
+    local_strategy=LocalStrategy.COPY,
+)
 
 class SpeakerVerifier:
 
@@ -124,3 +133,64 @@ class SpeakerVerifier:
         else:
             print(f"No match: {best_score}")
             return None
+
+
+def extract_embedding(wav_path: str) -> np.ndarray:
+    """
+    3초 wav -> (192,) ECAPA 임베딩 반환
+    """
+    with torch.no_grad():
+        emb = _ecapa.encode_file(wav_path)  # shape: (1, 192)
+    emb = emb.squeeze(0).cpu().numpy()
+    return emb
+
+
+class SpeakerVerifierDB:
+    def __init__(self, db_session_factory, threshold: float = 0.30):
+        """
+        db_session_factory: SessionLocal 같은 걸 주입
+        """
+        self.db_session_factory = db_session_factory
+        self.threshold = threshold
+
+    def _get_registered_embedding(self, email: str):
+        from smarterspeaker import models  # 순환 import 피하려면 위로 옮겨도 됨
+
+        db = self.db_session_factory()
+        try:
+            vp = (
+                db.query(models.UserVoiceProfile)
+                .join(models.User)
+                .filter(models.User.email == email)
+                .first()
+            )
+            if vp is None or vp.embedding_json is None:
+                print(f"[WARN] no voice profile in DB for '{email}'")
+                return None
+
+            emb_list = json.loads(vp.embedding_json)
+            emb = torch.tensor(emb_list, dtype=torch.float32)
+            return emb
+        finally:
+            db.close()
+
+    def verify(self, email: str, wav_path: str):
+        """
+        email 기준으로 DB에서 등록된 임베딩을 꺼내서
+        현재 wav와 cosine similarity 비교
+        """
+        enrolled_emb = self._get_registered_embedding(email)
+        if enrolled_emb is None:
+            return False, float("-inf")
+
+        with torch.no_grad():
+            test_emb = _ecapa.encode_file(wav_path).squeeze(0).cpu()
+
+        # cosine similarity 계산
+        score = torch.nn.functional.cosine_similarity(
+            test_emb.unsqueeze(0),
+            enrolled_emb.unsqueeze(0),
+        ).item()
+
+        is_match = score >= self.threshold
+        return is_match, score

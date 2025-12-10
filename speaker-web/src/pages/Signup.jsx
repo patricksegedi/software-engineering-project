@@ -1,50 +1,35 @@
 // src/pages/Signup.jsx
 import "../Auth.css"
 import { Link, useNavigate } from "react-router-dom"
-import { addUser } from "../userStorage"
-
-const MASTER_KEY = "01046480328"
+import { signupApi } from "../api/auth"
 
 export default function Signup() {
   const navigate = useNavigate()
 
-    const handleSignup = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
     const formData = new FormData(e.target)
+    const name = formData.get("name")
     const email = formData.get("email")
     const password = formData.get("password")
-    const masterkey = formData.get("masterkey") // 입력한 마스터키
-
-    // 마스터키가 정확히 01046480328이면 admin, 아니면 user
-    const role =
-      masterkey && masterkey.trim() === MASTER_KEY ? "admin" : "user"
-
-    const familyRole = "Member" // 기본값
+    const masterkey = formData.get("masterkey") // 빈 문자열일 수도 있음
+    const age = formData.get("age")
+    const familyRole = formData.get("familyRole")
 
     try {
-      // 1) 기존 로컬 유저 저장 (지금 구조 유지)
-      addUser({ email, password, role, familyRole })
-
-      // 2) 스피커 백엔드에도 유저 등록
-      //    name은 일단 이메일 앞부분, age는 임시로 20으로 설정
-      await fetch("http://127.0.0.1:8000/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: email.split("@")[0] || email,
-          age: 20,
-        }),
+      await signupApi({
+        name,
+        email,
+        password,
+        age,
+        familyRole,
+        masterKey: masterkey, // 백엔드에서 master_key로 받게 되어 있음
       })
-
-      alert(
-        role === "admin"
-          ? "Admin account created. You can now log in."
-          : "Account created. You can now log in."
-      )
+      alert("회원가입이 완료되었습니다. 로그인해주세요.")
       navigate("/login")
     } catch (err) {
       console.error(err)
-      alert(err.message || "Failed to sign up.")
+      alert("회원가입 중 오류가 발생했습니다.")
     }
   }
 
@@ -52,9 +37,22 @@ export default function Signup() {
     <div className="auth-container">
       <div className="auth-card">
         <h1 className="auth-title">Create an account</h1>
-        <p className="auth-subtitle">Sign up to access your smart home</p>
+        <p className="auth-subtitle">
+          Sign up to start using your smart home
+        </p>
 
         <form onSubmit={handleSignup} className="auth-form">
+          {/* ✅ 이름 필드 추가 */}
+          <label className="auth-label">
+            Name
+            <input
+              type="text"
+              name="name"
+              className="auth-input"
+              placeholder="Enter your name"
+            />
+          </label>
+
           <label className="auth-label">
             Email
             <input type="email" name="email" className="auth-input" required />
@@ -67,16 +65,41 @@ export default function Signup() {
               name="password"
               className="auth-input"
               required
+              maxLength={72} // ✅ 너가 마지막에 붙여준 maxLength 반영
             />
           </label>
 
           <label className="auth-label">
-            Master key (optional)
+            Age
             <input
-              type="text"
-              name="masterkey"
-              placeholder="Enter master key for admin"
+              type="number"
+              name="age"
               className="auth-input"
+              min="0"
+              max="120"
+            />
+          </label>
+
+          {/* ❌ Sign up as admin 체크박스 제거 */}
+
+          <label className="auth-label">
+            Family role
+            <select name="familyRole" className="auth-input">
+              <option value="">Select role</option>
+              <option value="parent">Parent</option>
+              <option value="child">Child</option>
+              <option value="guest">Guest</option>
+            </select>
+          </label>
+
+          <label className="auth-label">
+            Master key
+            <input
+              type="password"
+              name="masterkey"
+              className="auth-input"
+              placeholder="(optional) Enter master key"
+              // ✅ required 제거: 비워도 회원가입 되게
             />
           </label>
 

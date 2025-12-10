@@ -1,21 +1,32 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useAuth } from "../../AuthContext"
 
 export default function VoiceEnroll() {
   const { user } = useAuth()
   const [recorder, setRecorder] = useState(null)
-  const [chunks, setChunks] = useState([])
+  const chunksRef = useRef([]) // ✅ state 대신 ref 사용
 
   const start = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
     const mr = new MediaRecorder(stream)
 
-    setChunks([])
-    mr.ondataavailable = (e) => setChunks((prev) => [...prev, e.data])
-    mr.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/webm" })
-      upload(blob)
+    // 새 녹음 시작할 때 버퍼 초기화
+    chunksRef.current = []
+
+    mr.ondataavailable = (e) => {
+      if (e.data && e.data.size > 0) {
+        chunksRef.current.push(e.data)
+      }
     }
+
+    mr.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: "audio/webm" })
+      upload(blob)
+
+      // 마이크 스트림도 정리
+      stream.getTracks().forEach((t) => t.stop())
+    }
+
     mr.start()
     setRecorder(mr)
   }
@@ -26,6 +37,7 @@ export default function VoiceEnroll() {
 
   const upload = async (blob) => {
     const fd = new FormData()
+
     // 스피커 쪽 name은 회원가입 때 보낸 name과 맞춰야 함
     const speakerName = user.email.split("@")[0]
 

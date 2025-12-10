@@ -1,129 +1,172 @@
-// src/pages/Admin/DeviceManagement.jsx
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./DeviceManagement.css"
+import { getZonesApi } from "../../api/zones"
+import {
+  getDevicesApi,
+  createDeviceApi,
+  deleteDeviceApi,
+} from "../../api/devices"
 
-const ZONES = ["Living room", "Kitchen", "Bedroom", "Entrance"]
-const TYPES = ["light", "tv", "door"]
+const DEVICE_TYPES = [
+  { value: "light", label: "Light" },
+  { value: "tv", label: "TV" },
+  { value: "ac", label: "Air conditioner" },
+  { value: "door", label: "Door" },
+]
 
 export default function DeviceManagement() {
-  const [devices, setDevices] = useState([
-    { id: 1, name: "Living room lights", type: "light", zone: "Living room" },
-    { id: 2, name: "Living room TV", type: "tv", zone: "Living room" },
-    { id: 3, name: "Bedroom lights", type: "light", zone: "Bedroom" },
-    { id: 4, name: "Main door", type: "door", zone: "Entrance" },
-  ])
-
+  const [zones, setZones] = useState([])
+  const [devices, setDevices] = useState([])
   const [newName, setNewName] = useState("")
   const [newType, setNewType] = useState("light")
-  const [newZone, setNewZone] = useState("Living room")
+  const [newZoneId, setNewZoneId] = useState("")
+  const [loading, setLoading] = useState(true)
 
-  const handleAddDevice = (e) => {
+  useEffect(() => {
+    async function load() {
+      try {
+        const [zonesData, devicesData] = await Promise.all([
+          getZonesApi(),
+          getDevicesApi(),
+        ])
+        setZones(zonesData)
+        setDevices(devicesData)
+      } catch (err) {
+        console.error(err)
+        alert("서버에서 디바이스/존 정보를 불러오지 못했습니다.")
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const handleAddDevice = async (e) => {
     e.preventDefault()
     const trimmed = newName.trim()
-    if (!trimmed) return
+    if (!trimmed || !newZoneId) return
 
-    const nextId = devices.length ? Math.max(...devices.map(d => d.id)) + 1 : 1
-
-    setDevices(prev => [
-      ...prev,
-      { id: nextId, name: trimmed, type: newType, zone: newZone },
-    ])
-
-    setNewName("")
-    setNewType("light")
-    setNewZone("Living room")
+    try {
+      const created = await createDeviceApi({
+        name: trimmed,
+        type: newType,
+        zoneId: newZoneId,
+      })
+      setDevices((prev) => [...prev, created])
+      setNewName("")
+      setNewType("light")
+      setNewZoneId("")
+    } catch (err) {
+      console.error(err)
+      alert("디바이스를 추가하는 중 오류가 발생했습니다.")
+    }
   }
 
-  const handleDelete = (id) => {
-    if (!confirm("Remove this device? (Demo only)")) return
-    setDevices(prev => prev.filter(d => d.id !== id))
+  const handleDeleteDevice = async (id) => {
+    if (!window.confirm("이 디바이스를 삭제하시겠습니까?")) return
+    try {
+      await deleteDeviceApi(id)
+      setDevices((prev) => prev.filter((d) => d.id !== id))
+    } catch (err) {
+      console.error(err)
+      alert("디바이스 삭제 중 오류가 발생했습니다.")
+    }
+  }
+
+  const findZoneLabel = (device) => {
+    if (device.zone) {
+      return device.zone.display_name || device.zone.name
+    }
+    const z = zones.find((z) => z.id === device.zone_id)
+    return z ? z.display_name || z.name : "Unknown"
   }
 
   return (
     <div className="devices-container">
-      <h1 className="devices-title">Device Management</h1>
-      <p className="devices-subtitle">
-        Add, view and remove smart devices connected to each zone.
-      </p>
+      <header className="devices-header">
+        <h1 className="devices-title">Device management</h1>
+        <p className="devices-subtitle">
+          각 존에 연결된 스마트 디바이스를 등록하고 관리합니다.
+        </p>
+      </header>
 
-      {/* Add device form */}
       <section className="devices-section">
         <h2 className="devices-section-title">Add new device</h2>
-        <form className="add-device-form" onSubmit={handleAddDevice}>
+
+        <form className="devices-form" onSubmit={handleAddDevice}>
           <input
+            className="devices-input"
             type="text"
-            className="device-input"
-            placeholder="e.g. Kids' room lights"
+            placeholder="Device name (e.g. Living room lights)"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
+            required
           />
 
           <select
-            className="select-field"
+            className="devices-select"
             value={newType}
             onChange={(e) => setNewType(e.target.value)}
           >
-            {TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            {DEVICE_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
               </option>
             ))}
           </select>
 
           <select
-            className="select-field"
-            value={newZone}
-            onChange={(e) => setNewZone(e.target.value)}
+            className="devices-select"
+            value={newZoneId}
+            onChange={(e) => setNewZoneId(e.target.value)}
+            required
           >
-            {ZONES.map((z) => (
-              <option key={z} value={z}>
-                {z}
+            <option value="">Select zone</option>
+            {zones.map((z) => (
+              <option key={z.id} value={z.id}>
+                {z.display_name || z.name}
               </option>
             ))}
           </select>
 
-          <button type="submit" className="primary-btn">
+          <button className="devices-add-btn" type="submit">
             Add device
           </button>
         </form>
-
-        <p className="devices-hint">
-          This is a demo form. In a real system, devices would be stored in a
-          database and linked to hardware.
-        </p>
       </section>
 
-      {/* Device list */}
       <section className="devices-section">
-        <h2 className="devices-section-title">Current devices</h2>
+        <h2 className="devices-section-title">Existing devices</h2>
 
-        <div className="devices-table">
-          <div className="devices-header">
-            <span>Name</span>
-            <span>Type</span>
-            <span>Zone</span>
-            <span>Actions</span>
+        {loading ? (
+          <p className="devices-empty">Loading devices...</p>
+        ) : (
+          <div className="devices-list">
+            {devices.map((device) => (
+              <div key={device.id} className="device-card">
+                <div className="device-main">
+                  <div className="device-name">{device.name}</div>
+                  <div className="device-meta">
+                    <span className="device-type">{device.type}</span>
+                    <span className="device-zone">{findZoneLabel(device)}</span>
+                    <span className="device-status">{device.status}</span>
+                  </div>
+                </div>
+                <button
+                  className="device-remove-btn"
+                  type="button"
+                  onClick={() => handleDeleteDevice(device.id)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+
+            {devices.length === 0 && !loading && (
+              <p className="devices-empty">No devices configured yet.</p>
+            )}
           </div>
-
-          {devices.map((device) => (
-            <div key={device.id} className="devices-row">
-              <span className="device-name">{device.name}</span>
-              <span className="device-type">{device.type}</span>
-              <span className="device-zone">{device.zone}</span>
-              <button
-                type="button"
-                className="secondary-btn"
-                onClick={() => handleDelete(device.id)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-
-          {devices.length === 0 && (
-            <p className="devices-empty">No devices configured yet.</p>
-          )}
-        </div>
+        )}
       </section>
     </div>
   )

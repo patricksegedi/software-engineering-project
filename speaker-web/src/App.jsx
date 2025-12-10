@@ -24,9 +24,17 @@ function MainLayout() {
 
 function RequireAdmin({ children }) {
   const { user } = useAuth()
-  if (!user || user.role !== "admin") {
+
+  // 로그인 안 되어 있으면 로그인 페이지로
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
+
+  // DB에서 온 플래그 사용: is_admin === true 인 경우만 접근 허용
+  if (!user.is_admin) {
     return <Navigate to="/dashboard" replace />
   }
+
   return children
 }
 
