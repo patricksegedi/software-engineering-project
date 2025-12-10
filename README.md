@@ -1,12 +1,27 @@
 # SmartER Speaker - Speaker-Adaptive Voice Assistant
-**Group 8:** 
 
 ## Our Team
-Jin Seo Hong: Frontend Developer
-Ken Lee: Ai Developer
-Nick Ki Gumann: Backend Developer
-Patrick Segedi: Pipeline Developer
-Tae Hee Kim: Project Manager, UI/UX Designer
+
+**Jin Seo Hong: Frontend Developer** \
+Frontend Developer handles front-end development and user interface design. Focuses on creating a seamless user experience by designing intuitive interfaces for voice assistant configuration and monitoring. Implements the interface using React or similar frameworks, ensuring the application is visually appealing, functional, and easy to navigate across different devices.
+
+**Ken Lee: AI Developer** \
+AI Developer is responsible for integrating AI features into the voice assistant system. Develops AI models for speaker recognition and intent understanding based on user interaction data, ensuring the system adapts to individual user needs. Focuses on using AI to enhance the product, providing personalized responses and automating voice commands while maintaining a user-friendly experience.
+
+**Nick Ki Gumann: Backend Developer** \
+Backend Developer manages the server-side infrastructure, ensuring the backend systems function smoothly. This involves working with databases for user profiles and preferences, optimizing data queries, and ensuring data integrity for the voice assistant application.
+
+**Patrick Segedi: Pipeline Developer**\
+Pipeline Developer develops the core voice processing pipeline, including audio stream handling, speech recognition integration, and command execution logic. Implements multi-user management systems, conflict resolution mechanisms, and role-based access control. Ensures efficient communication between voice assistant components and smart home devices while maintaining system security and reliability.
+
+**Tae Hee Kim: Project Manager, UI/UX Designer**
+Oversees the development process, managing schedules, ensuring product quality, and coordinating the team to meet user requirements and expectations. Additionally handles UI/UX design, creating voice interaction flows and visual feedback systems that make the multi-user voice assistant intuitive and accessible for all family members.
+
+---
+
+## Demo Video
+Watch our demo video by clicking the image below.\
+[![Video Label](http://img.youtube.com/vi/-ynqgneOUV8/0.jpg)](https://youtu.be/-ynqgneOUV8)
 
 ---
 
@@ -26,21 +41,8 @@ Currently, we offer the following features in our system:
 * **Speaker Recognition**
     Identifies individual users using voice biometrics
 
-* **Location Awareness**
-    Determines which room commands originate from
-
 * **Role-Based Access Control**
     Different permissions for parents, children, and guests
 
 * **Smart Home Control**
     Lights, TV, door control, and expandable services
-
----
-
-## Trailor Video
-Watch our trailor video by clicking the image below.\
-[![Video Label](http://img.youtube.com/vi/-ynqgneOUV8/0.jpg)](https://youtu.be/-ynqgneOUV8)
-
-## Demo Video
-Watch our demo implementation video by clicking the image below.\
-[![Video Label](http://img.youtube.com/vi/jxZdxNKbU_A/0.jpg)](https://youtu.be/jxZdxNKbU_A)
