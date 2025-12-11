@@ -1,95 +1,76 @@
-\documentclass[12pt]{article}
+\documentclass[conference]{IEEEtran}
 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{listingsutf8}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{amsmath}
 \usepackage{longtable}
 \usepackage{booktabs}
 \usepackage{array}
 
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{geometry}
-\geometry{margin=1in}
+\lstset{
+  inputencoding=utf8,
+  extendedchars=true,
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  literate=
+    {’}{{'}}1   % 스마트 아포스트로피 → '
+    {‘}{{`}}1   % 여는 따옴표 → `
+    {“}{{``}}1  % 여는 큰따옴표 → ``
+    {”}{{''}}1  % 닫는 큰따옴표 → ''
+    {–}{{-}}1   % en dash → -
+    {—}{{-}}1   % em dash → -
+}
+
 \begin{document}
 
+\title{Speaker-Adaptive Voice Assistant for Multi-User Homes}
 
-Speaker-Adaptive Voice Assistant for Multi-User Homes
+\author{
+\IEEEauthorblockN{
+Ken Lee\IEEEauthorrefmark{1},
+Tae Hee Kim\IEEEauthorrefmark{2},
+Patrick Segedi\IEEEauthorrefmark{3},
+Jinseo Hong\IEEEauthorrefmark{1},
+Nick Ki Gumann\IEEEauthorrefmark{4}
+}
+\IEEEauthorblockA{\IEEEauthorrefmark{1}Dept. of Information Systems, Hanyang University, Seoul \& Paju, Republic of Korea\\
+Email: ceh1502@hanyang.ac.kr, h0dduck@hanyang.ac.kr}
+\IEEEauthorblockA{\IEEEauthorrefmark{2}Dept. of English Language and Literature, Hanyang University, Seoul, Republic of Korea\\
+Email: pieceofmind@hanyang.ac.kr}
+\IEEEauthorblockA{\IEEEauthorrefmark{3}Dept. of Computer Science, Chalmers University of Technology, Gothenburg, Sweden\\
+Email: segedi@chalmers.se}
+\IEEEauthorblockA{\IEEEauthorrefmark{4}Zurich University of Applied Sciences, Zurich, Switzerland\\
+Email: gumannic@students.zhaw.ch}
+}
 
-Ken Lee
+\maketitle
 
-\emph{Dept. of Information Systems}
+\begin{abstract}
+In modern smart homes, voice assistants like Alexa and Google Home serve multiple family members but treat everyone the same way. This application combines speaker recognition with speaker-adaptive processing to create a personalized experience for each household member. The system identifies who is speaking, determines their location within the house, and enforces access rules based on whether the user is a parent or a child. To protect user privacy, all voice data is processed locally on the device rather than being transmitted to external servers. When multiple users issue conflicting commands, the system resolves them according to predefined rules and user priority levels. Our goal is to develop a voice assistant that genuinely understands and adapts to the needs of each family member while ensuring the privacy of their conversations.
+\end{abstract}
 
-\emph{Hanyang University}
+\begin{IEEEkeywords}
+Voice Assistant, Speaker Recognition, Multi-User Personalization, Smart Home, Privacy
+\end{IEEEkeywords}
 
-\emph{Seoul, Republic of Korea}
+\section*{Team Roles}
 
-\emph{ceh1502@hanyang.ac.kr}
-
-Tae Hee Kim
-
-\emph{Dept. of English Language and Literature}
-
-\emph{Hanyang University}
-
-\emph{Seoul, Republic of Korea}
-
-\emph{pieceofmind@hanyang.ac.kr}
-
-Patrick Segedi
-
-\emph{Dept. of Computer Science}
-
-\emph{Chalmers Unviersity of Technology}
-
-\emph{Gothenburg, Sweden}
-
-\emph{segedi@chalmers.se}
-
-Jinseo Hong
-
-\emph{Dept. of Information Systems}
-
-\emph{Hanyang University}
-
-\emph{Paju, Republic of Korea}
-
-\emph{h0dduck@hanyang.ac.kr}
-
-Nick Ki Gumann
-
-\emph{Dept. of Information Systems}
-
-Zurich University of Applied
-
-\emph{Zurich, Switzerland}
-
-\emph{gumannic@students.zhaw.ch}
-
-\emph{\textbf{Abstract---In modern smart homes, voice assistants like
-Alexa and Google Home serve multiple family members but treat everyone
-the same way. This application combines speaker recognition with
-speaker-adaptive processing to create a personalized experience for each
-household member. The system identifies who is speaking, determines
-their location within the house, and enforces access rules based on
-whether the user is a parent or a child. To protect user privacy, all
-voice data is processed locally on the device rather than being
-transmitted to external servers. When multiple users issue conflicting
-commands, the system resolves them according to predefined rules and
-user priority levels. Our goal is to develop a voice assistant that
-genuinely understands and adapts to the needs of each family member
-while ensuring the privacy of their conversations.}}
-
-\emph{\textbf{Index Terms---Voice Assistant, Speaker Recognition,
-Multi-User Personalization, Smart Home, Privacy}}
-
-\begin{longtable}{p{0.18\linewidth} p{0.22\linewidth} p{0.55\linewidth}}
+\begin{table*}[t]
+\centering
+\begin{tabular}{p{0.18\linewidth} p{0.22\linewidth} p{0.55\linewidth}}
 \toprule
 \textbf{Name} & \textbf{Roles} & \textbf{Task description and etc} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Name} & \textbf{Roles} & \textbf{Task description and etc} \\
-\midrule
-\endhead
 
 Ken Lee & Software Developer (AI) &
 Responsible for integrating AI features into the voice assistant system. Develops AI models for
@@ -122,13 +103,11 @@ the team to meet user requirements and expectations. Additionally handles UI/UX 
 voice interaction flows and visual feedback systems that make the multi-user voice assistant
 intuitive and accessible for all family members. \\
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table*}
 
-\hypertarget{introduction}{%
-\section{Introduction}\label{introduction}}
-
-\hypertarget{motivation}{%
-\subsection{Motivation}\label{motivation}}
+\section{Introduction}
+\subsection{Motivation}
 
 In the rapidly evolving world of smart home technology, three key
 elements -- personalization, privacy, and contextual intelligence -- are
@@ -159,8 +138,7 @@ the SmartER Speaker. This system will recognize each user, ensure
 privacy through on-device processing, and ultimately create a more
 seamless and personalized smart home experience.
 
-\hypertarget{problem-statement}{%
-\subsection{Problem Statement}\label{problem-statement}}
+\subsection{Problem Statement}
 
 Existing voice assistants still lack effective multi-user
 personalization. Although technologies exist to distinguish between
@@ -194,8 +172,7 @@ improve the overall intelligence, safety, and accessibility of the
 connected home. To address these needs, we aim to develop a
 Speaker-Adaptive Voice Assistant that meets all these requirements.
 
-\hypertarget{requirements}{%
-\section{Requirements}\label{requirements}}
+\section{Requirements}
 
 \emph{A. Mobile Application}
 
@@ -231,8 +208,7 @@ it can provide kid-friendly content, ensuring a safe and personalized
 experience. Through this intelligent voice recognition, the system
 creates a customized and secure environment for every user.
 
-\hypertarget{development-environment}{%
-\section{Development Environment}\label{development-environment}}
+\section{Development Environment}
 
 \emph{A. Choice of software development platform}
 
@@ -383,8 +359,7 @@ real time.
 
 Will be provided in the next phase.
 
-\hypertarget{specifications}{%
-\section{Specifications}\label{specifications}}
+\section{Specifications}
 
 \emph{A. Requirement 1 -- Mobile Application}
 
@@ -476,13 +451,16 @@ rooms. This enables detection of where the user is speaking from and
 responds accordingly, creating a more seamless and speaker-adaptive
 experience.
 
-\hypertarget{architecture-design-implementation}{%
-\section{Architecture Design \&
-Implementation}\label{architecture-design-implementation}}
+\section{Architecture Design \& Implementation}
 
 \emph{A. Overall Architecture}
 
-\includegraphics[width=7.02778in,height=2.49306in]{media/image1.png}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{media/image1.png}
+\caption{Overall Architecture}
+\label{fig:architecture}
+\end{figure}
 
 This smart speaker system features a distributed architecture with clear
 separation of concerns. The Raspberry Pi serves as the local processing
@@ -510,32 +488,62 @@ both privacy (local voice processing) and powerful AI capabilities
 
 \emph{B. Directory Organization}
 
-\begin{longtable}{p{0.22\linewidth} p{0.43\linewidth} p{0.25\linewidth}}
+\begin{table*}[t]
+\centering
+\begin{tabular}{p{0.22\linewidth} p{0.43\linewidth} p{0.25\linewidth}}
 \toprule
 \textbf{Directory} & \textbf{File Names} & \textbf{Module Names in Use} \\
 \midrule
-\endfirsthead
+/.vscode &
+c\_cpp\_properties.json, launch.json, settings.json &
+N/A (Configuration files) \\
 
-\toprule
-\textbf{Directory} & \textbf{File Names} & \textbf{Module Names in Use} \\
-\midrule
-\endhead
+/Document &
+Document.aux, Document.fdb\_latexmk, Document.fls, Document.pdf, Document.synctex.gz, Document.tex, SmartER\_Speaker.docx &
+N/A (Documentation files) \\
 
-/.vscode & c\_cpp\_properties.json, launch.json, settings.json & N/A (Configuration files) \\
-/Document & Document.aux, Document.fdb\_latexmk, Document.fls, Document.pdf, Document.synctex.gz, Document.tex, SmartER\_Speaker.docx & N/A (Documentation files) \\
-/src/ & main.py, smarterspeaker.app & smarterspeaker.app \\
-/src/backend/utility/model & RestrictionDbo.py, UserDbo.py & dataclasses, typing \\
-/src/backend/utility/repositories & RestrictionDboRepository.py, UserDboRepository.py & json, pathlib, typing, model.RestrictionDbo, model.UserDbo \\
-/src/backend/utility/repositories/test & test\_user\_repository.py & unittest, sys, pathlib, repositories.UserDboRepository \\
-/src/smarterspeaker & \_\_init\_\_.py, app.py, config.py, users.JSON & pathlib, json \\
-/src/smarterspeaker/Users & \_\_init\_.py, admin\_user.py, guest\_user.py, restricted\_user.py, user.py & abc, typing \\
-/src/smarterspeaker/speaker & \_\_init\_\_.py, audio\_to\_text.py, speaker\_active.py, speaker\_verification.py, tts.py, voice\_recorder.py, wake\_word\_activation.py & speechbrain, sounddevice, soundfile, torch, numpy, os, pathlib, playsound, pyttsx3 \\
-/src/smarterspeaker/voice\_samples & jinseo/voices (voice files), kun/voices (voice files), patrick/voices (voice files), taehee/voices (voice files) & N/A (Audio data files) \\
-/src/smarterspeaker/voices & invalid.mp3 & N/A (Audio files) \\
-/ (root) & .gitignore, Introduction.md, README.md, SETUP.md & N/A (Project documentation) \\
+/src/ &
+main.py, smarterspeaker.app &
+smarterspeaker.app \\
+
+/src/backend/utility/model &
+RestrictionDbo.py, UserDbo.py &
+dataclasses, typing \\
+
+/src/backend/utility/repositories &
+RestrictionDboRepository.py, UserDboRepository.py &
+json, pathlib, typing, model.RestrictionDbo, model.UserDbo \\
+
+/src/backend/utility/repositories/test &
+test\_user\_repository.py &
+unittest, sys, pathlib, repositories.UserDboRepository \\
+
+/src/smarterspeaker &
+\_\_init\_\_.py, app.py, config.py, users.JSON &
+pathlib, json \\
+
+/src/smarterspeaker/Users &
+\_\_init\_.py, admin\_user.py, guest\_user.py, restricted\_user.py, user.py &
+abc, typing \\
+
+/src/smarterspeaker/speaker &
+\_\_init\_\_.py, audio\_to\_text.py, speaker\_active.py, speaker\_verification.py, tts.py, voice\_recorder.py, wake\_word\_activation.py &
+speechbrain, sounddevice, soundfile, torch, numpy, os, pathlib, playsound, pyttsx3 \\
+
+/src/smarterspeaker/voice\_samples &
+jinseo/voices (voice files), kun/voices (voice files), patrick/voices (voice files), taehee/voices (voice files) &
+N/A (Audio data files) \\
+
+/src/smarterspeaker/voices &
+invalid.mp3 &
+N/A (Audio files) \\
+
+/ (root) &
+.gitignore, Introduction.md, README.md, SETUP.md &
+N/A (Project documentation) \\
 \bottomrule
-\end{longtable}
-
+\end{tabular}
+\end{table*}
 
 
 \emph{C. Module 1: Voice Recorder (voice\_recorder.py)}
@@ -549,20 +557,14 @@ wake-word and speaker-verification modules. Low-latency acquisition is
 necessary for the system's responsiveness when users issue voice
 commands.
 \end{quote}
-
 \emph{2) Functionality}
 
-\begin{longtable}{p{0.35\linewidth} p{0.60\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.35\linewidth} p{0.60\linewidth}}
 \toprule
 \textbf{Function} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Function} & \textbf{Description} \\
-\midrule
-\endhead
-
 Real-time audio capture &
 Streams audio from microphone input \\
 
@@ -574,9 +576,9 @@ Converts input into mono, 16 kHz sample rate \\
 
 Export &
 Store audio as .wav file for downstream modules \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 
 \emph{3) Source Code Location}
@@ -585,17 +587,12 @@ Store audio as .wav file for downstream modules \\
 
 \emph{4) Implementation Components}
 
-\begin{longtable}{p{0.30\linewidth} p{0.65\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.30\linewidth} p{0.65\linewidth}}
 \toprule
 \textbf{Component} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Component} & \textbf{Description} \\
-\midrule
-\endhead
-
 sounddevice &
 Handles live microphone stream \\
 
@@ -607,9 +604,9 @@ Buffer manipulation and preprocessing \\
 
 Internal methods &
 record\_audio(), save\_audio(), normalize\_audio() \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 
 \emph{5) External References}
@@ -641,7 +638,11 @@ local audio segments provides the following:
 \emph{7) Graphical Representation}
 \end{quote}
 
-\includegraphics[width=6.51129in,height=1.0983in]{media/image2.png}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.95\textwidth]{media/image2.png}
+\caption{Voice Recorder Pipeline}
+\end{figure*}
 
 \emph{D. Module 2: Wake Word Detection}
 
@@ -656,17 +657,12 @@ after explicit user intent.
 
 \emph{2) Functionality}
 
-\begin{longtable}{p{0.35\linewidth} p{0.60\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.35\linewidth} p{0.60\linewidth}}
 \toprule
 \textbf{Function} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Function} & \textbf{Description} \\
-\midrule
-\endhead
-
 Speech-to-Text conversion &
 Converts input waveform to text \\
 
@@ -678,9 +674,9 @@ Designed to operate in home-noise conditions \\
 
 Trigger logic &
 Activates subsequent modules upon detection \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 
 \emph{3) Source Code Location}
@@ -691,17 +687,12 @@ Activates subsequent modules upon detection \\
 
 \emph{4) Implementation Components}
 
-\begin{longtable}{p{0.30\linewidth} p{0.65\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.30\linewidth} p{0.65\linewidth}}
 \toprule
 \textbf{Component} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Component} & \textbf{Description} \\
-\midrule
-\endhead
-
 faster-whisper &
 Primary STT inference engine \\
 
@@ -710,9 +701,9 @@ Lightweight model optimized for latency \\
 
 Internal methods &
 transcribe\_audio(), detect\_awake\_word() \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 
 \emph{5) External References}
@@ -746,7 +737,13 @@ preparation and supports the following:
 \emph{7) Graphical Representation}
 \end{quote}
 
-\includegraphics[width=7.02778in,height=2.01736in]{media/image3.png}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\columnwidth]{media/image3.png}
+\caption{Wake Word Detection Pipeline}
+\label{fig:wakeword}
+\end{figure}
+
 
 \emph{E. Module 3: Speaker Verification}
 
@@ -758,19 +755,15 @@ speaking by extracting a speaker embedding from the user's voice and
 comparing it to the stored embeddings in the database. This enables
 role-based access control (RBAC) in multi-user households.
 \end{quote}
+
 \emph{2) Functionality}
 
-\begin{longtable}{p{0.35\linewidth} p{0.60\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.35\linewidth} p{0.60\linewidth}}
 \toprule
 \textbf{Function} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Function} & \textbf{Description} \\
-\midrule
-\endhead
-
 Embedding extraction &
 Converts 3-second audio to 192-dimensional ECAPA-TDNN speaker embedding \\
 
@@ -782,10 +775,9 @@ Returns user ID and confidence score \\
 
 Security threshold &
 Grants access only when similarity $\geq$ 0.30 \\
-
 \bottomrule
-\end{longtable}
-
+\end{tabular}
+\end{table}
 
 
 \emph{3) Source Code Location}
@@ -794,17 +786,12 @@ Grants access only when similarity $\geq$ 0.30 \\
 
 \emph{4) Implementation Components}
 
-\begin{longtable}{p{0.30\linewidth} p{0.65\linewidth}}
+\begin{table}[t]
+\centering
+\begin{tabular}{p{0.30\linewidth} p{0.65\linewidth}}
 \toprule
 \textbf{Component} & \textbf{Description} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Component} & \textbf{Description} \\
-\midrule
-\endhead
-
 speechbrain &
 Speaker embedding generation \\
 
@@ -816,9 +803,9 @@ speechbrain/spkrec-ecapa-voxceleb (HuggingFace) \\
 
 Internal methods &
 extract\_embedding(), match\_speaker(), compute\_similarity() \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table}
 
 
 \emph{5) External References}
@@ -850,7 +837,13 @@ offers the following:
 \begin{quote}
 \emph{7) Graphical Representation}
 
-\includegraphics[width=7.02778in,height=2.26597in]{media/image4.png}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\columnwidth]{media/image4.png}
+\caption{Speaker Verification Model Overview}
+\label{fig:spkverify}
+\end{figure}
+
 \end{quote}
 
 \emph{F. Module 4:FastAPI Backend \& Database}
@@ -981,24 +974,20 @@ G. Module 5: Web Dashboards for Smart Home and OTT Integration
   and monitoring).
 \end{enumerate}
 
-\hypertarget{use-cases}{%
-\section{Use Cases}\label{use-cases}}
+\section{Use Cases}
+
+\section{Use Cases}
 
 \emph{A. Use Case 1: Web Application -- Basic Features}
 
-\begin{longtable}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
+\begin{table*}[t]
+\centering
+\begin{tabular}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
 \toprule
 \textbf{Use Case} & \textbf{Functionality} & \textbf{Initial state} & \textbf{Input} & \textbf{Output} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Use Case} & \textbf{Functionality} & \textbf{Initial state} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\endhead
-
 Register system &
-Creating a new user account &
+\raggedright Creating a new user account &
 Logged out: Register page &
 Master key (for admin access), email, password &
 Registration successful \\
@@ -1086,25 +1075,20 @@ Reflect device status changes triggered by voice commands &
 Logged in: Dashboard page &
 AI speaker sends /devices/\{id\} requests after recognizing a command &
 The device tiles on the dashboard update (e.g., lights from ``off'' to ``on'') without manual refresh. \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table*}
 
 \emph{B. Use Case 2: Web Application -- Admin Exclusive Features}
 
 \emph{1) Table for Web Application User Case}
 
-\begin{longtable}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
+\begin{table*}[t]
+\centering
+\begin{tabular}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
 \toprule
 \textbf{Use Case} & \textbf{Functionality} & \textbf{Initial state} & \textbf{Input} & \textbf{Output} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Use Case} & \textbf{Functionality} & \textbf{Initial state} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\endhead
-
 Admin &
 Navigate to Admin &
 Logged in &
@@ -1164,27 +1148,28 @@ Remove IoT devices from a specific room &
 Logged in: Devices page &
 Click on the ``Remove'' button on a specific device. &
 Deletes a specific IoT device from the room. \\
-
 \bottomrule
-\end{longtable}
-
+\end{tabular}
+\end{table*}
 
 \emph{2) Screenshots for Web Application User Case}
 
-\includegraphics[width=4.19444in,height=3.84722in]{media/image5.png}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.90\textwidth]{media/image5.png}
+\caption{Web Application User Interface}
+\label{fig:webui}
+\end{figure*}
+
+
 \emph{B: Speaker Interaction}
 
-\begin{longtable}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
+\begin{table*}[t]
+\centering
+\begin{tabular}{p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.18\linewidth} p{0.22\linewidth}}
 \toprule
 \textbf{Use Case} & \textbf{Functionality} & \textbf{Initial System State} & \textbf{Input} & \textbf{Output} \\
 \midrule
-\endfirsthead
-
-\toprule
-\textbf{Use Case} & \textbf{Functionality} & \textbf{Initial System State} & \textbf{Input} & \textbf{Output} \\
-\midrule
-\endhead
-
 Wake word &
 Listen for wake word &
 Listening state &
@@ -1226,9 +1211,9 @@ Control lights, TV, or door via voice command &
 System in listening state after wake word and speaker verification &
 Spoken command such as ``Turn on the living room lights'' &
 The AI speaker sends a REST request to the FastAPI backend, which updates the device state in MySQL; the web dashboard reflects the new state and, in a real deployment, the corresponding IoT device would be switched on. \\
-
 \bottomrule
-\end{longtable}
+\end{tabular}
+\end{table*}
 
 
 \end{document}
