@@ -23,10 +23,27 @@ Oversees the development process, managing schedules, ensuring product quality, 
 
 [![SmartER Speaker Demo](https://img.youtube.com/vi/uW7JgBTDY0g/0.jpg)](https://www.youtube.com/watch?v=uW7JgBTDY0g)
 
-
-
 ---
 
+## 📊 Project Presentation
+
+### 📄 Project Presentation (PDF Preview)
+
+<embed 
+  src="https://github.com/patricksegedi/software-engineering-project/raw/p_branch/Powerpoint/SoftwareEngineering%20Presentation.pdf"
+  type="application/pdf"
+  width="100%"
+  height="600px"
+/>
+
+> 👉 [PDF 전체 보기 / 다운로드](https://github.com/patricksegedi/software-engineering-project/raw/p_branch/Powerpoint/SoftwareEngineering%20Presentation.pdf)
+
+
+
+### ▶ PPTX Version  
+[📊 View / Download PPTX](https://github.com/patricksegedi/software-engineering-project/blob/p_branch/Powerpoint/SoftwareEngineering%20Presentation.pptx)
+
+---
 ## Introduction
 Smart home assistants, such as Alexa and Google Home, have become genuinely useful parts of our daily lives. But even at their best, they have a major limitation: they treat everyone in the house exactly the same. They do not know if you are a parent, a child, or a guest.
 
