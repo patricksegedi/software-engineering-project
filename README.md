@@ -65,3 +65,10 @@ Currently, we offer the following features in our system:
 
 * **Smart Home Control**
     Lights, TV, door control, and expandable services
+
+---
+## System Architechture
+
+## System Architecture
+
+![System Architecture](./Powerpoint/system_architechture.png)
