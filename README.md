@@ -20,8 +20,10 @@ Oversees the development process, managing schedules, ensuring product quality, 
 ---
 
 ## Demo Video
-Watch our demo video by clicking the image below.\
-[![Video Label](http://img.youtube.com/vi/-ynqgneOUV8/0.jpg)](https://youtu.be/-ynqgneOUV8)
+
+[![SmartER Speaker Demo](https://img.youtube.com/vi/uW7JgBTDY0g/0.jpg)](https://www.youtube.com/watch?v=uW7JgBTDY0g)
+
+
 
 ---
 
